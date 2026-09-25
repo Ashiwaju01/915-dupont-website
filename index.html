@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>915 Dupont — Rooms Coffee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C23B2B">
+<link rel="apple-touch-icon" href="images/icons/icon-192.png">
+</head>
+<body>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <button class="cart-close" id="cartClose">&times;</button>
+  <h3 class="display">Your Cart</h3>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Your cart is empty.</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row"><span>Total</span><span id="cartTotal" class="mono">$0</span></div>
+    <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="loginOverlay">
+  <div class="login-modal">
+    <button class="modal-close" id="loginClose">&times;</button>
+    <h3 class="display" id="loginTitle">Log In</h3>
+    <div class="sub" id="loginSub">Welcome back to 915 Dupont.</div>
+    <form id="loginForm">
+      <div class="field"><label class="mono">Email</label><input type="email" required placeholder="you@email.com"></div>
+      <div class="field" id="nameFieldWrap" style="display:none;"><label class="mono">Name</label><input type="text" placeholder="Your name"></div>
+      <div class="field"><label class="mono">Password</label><input type="password" required placeholder="••••••••"></div>
+      <button type="submit" class="submit-btn login-modal-submit" id="loginSubmitBtn">Log In</button>
+    </form>
+    <div class="modal-switch">No account? <a id="switchToSignup">Create one</a></div>
+    <div class="modal-note">This is a front-end demo — connect a backend to enable real accounts.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="brand display">915 DUPONT</div>
+  <div class="navlinks">
+    <a href="#clocks">The Room</a>
+    <a href="#menu">Menu</a>
+    <a href="#cocktails">Cocktails</a>
+    <a href="#coffee">Coffee</a>
+    <a href="#shop">Shop</a>
+  </div>
+  <div style="display:flex; align-items:center; gap:14px;">
+    <div class="toggle mono" id="dayNightToggle">
+      <span class="active" data-mode="day">Day</span>
+      <span data-mode="night">Night</span>
+    </div>
+    <button class="icon-btn mono" id="loginBtn" aria-label="Log in">Log In</button>
+    <button class="icon-btn cart-btn" id="cartBtn" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/></svg>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <a class="reserve-btn mono" href="#reserve">Reserve</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"><img src="images/915-dupont-noren-entrance.jpg" alt="915 Dupont noren entrance"></div>
+  <div class="hero-inner">
+    <div class="wrap">
+      <div class="hero-eyebrow mono">Rooms Coffee — 915 Dupont St, Toronto</div>
+      <h1 class="hero-title">A ROOM WITH<br>NO SIGN<span class="hand">coffee 'til 3:30, then the record drops</span></h1>
+      <p class="hero-sub">Hi-Fi lounge, cocktail bar, and coffee shop in one room on Dupont Street. Find the noren — that's the only sign you'll get.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#reserve">Reserve a table</a>
+        <a class="btn btn-ghost" href="#food">See the menu</a>
+      </div>
+      <div class="hero-hours">
+        <div class="block"><div class="label mono">Coffee</div><div class="time">9:00 – 3:30</div></div>
+        <div class="block"><div class="label mono">Bar</div><div class="time">5:00pm – 2:00am</div></div>
+        <div class="block"><div class="label mono">Kitchen</div><div class="time">Open late 'til 1am</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-track mono">
+      <span><b>No. 31</b> Canada's Best 100, 2026</span>
+      <span>No signage — look for the noren</span>
+      <span>Hi-Fi lounge after dark</span>
+      <span>Kitchen open late, every day 'til 1am</span>
+      <span><b>No. 31</b> Canada's Best 100, 2026</span>
+      <span>No signage — look for the noren</span>
+      <span>Hi-Fi lounge after dark</span>
+      <span>Kitchen open late, every day 'til 1am</span>
+    </div>
+  </div>
+</section>
+
+<section id="clocks">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">One Room</div>
+      <h2>Same four walls, two very different hours. Pick one to explore.</h2>
+    </div>
+    <div class="clock-toggle-row">
+      <div class="clock-chip active" data-clock="day">☕ Coffee, 9–3:30</div>
+      <div class="clock-chip" data-clock="night">🥃 Bar, 5pm–2am</div>
+    </div>
+    <div class="clock-panel active" data-panel="day">
+      <div class="clock-copy">
+        <p>Mornings move slow here on purpose. Filter and espresso, good light through the front window, low music, and a room built for sitting still rather than turning tables fast.</p>
+        <p>Order at the counter and find a seat — the kitchen's already prepping for lunch service by mid-morning.</p>
+        <div class="clock-stats">
+          <div class="stat"><b>9:00</b><span>OPEN</span></div>
+          <div class="stat"><b>3:30</b><span>LAST CALL, COFFEE</span></div>
+          <div class="stat"><b>7</b><span>DAYS A WEEK</span></div>
+        </div>
+      </div>
+      <div class="clock-photo"><img src="images/915-dupont-daytime-interior.jpg" alt="915 Dupont daytime interior"></div>
+    </div>
+    <div class="clock-panel" data-panel="night">
+      <div class="clock-copy">
+        <p>Once coffee service ends, the lights come down and the needle goes on. A proper Hi-Fi system carries the room, seats sit close together, and the kitchen keeps going until 1am.</p>
+        <p>No sign out front still applies — just find the noren and go in.</p>
+        <div class="clock-stats">
+          <div class="stat"><b>5PM</b><span>DOORS</span></div>
+          <div class="stat"><b>2AM</b><span>LAST CALL</span></div>
+          <div class="stat"><b>#31</b><span>CANADA'S BEST 100</span></div>
+        </div>
+      </div>
+      <div class="clock-photo"><img src="images/915-dupont-bar-at-night.jpg" alt="915 Dupont bar at night"></div>
+    </div>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">The Menu</div>
+      <h2>Everything on offer, in one place.</h2>
+      <p class="sub">Browse by category, or scroll down for the full photo menu with descriptions.</p>
+    </div>
+    <div class="menu-tab-row">
+      <div class="menu-tab active" data-menutab="dinner">Dinner</div>
+      <div class="menu-tab" data-menutab="lunch">Lunch</div>
+      <div class="menu-tab" data-menutab="cocktails">Cocktails</div>
+      <div class="menu-tab" data-menutab="coffee">Coffee &amp; Drinks</div>
+    </div>
+
+    <div class="menu-list active" data-menupanel="dinner">
+      <div class="menu-row"><span class="mn">Tsukemono <em>— assorted Japanese pickles</em></span><span class="mp">$6</span></div>
+      <div class="menu-row"><span class="mn">Edamame <em>— chili oil, soy konbu, sesame</em></span><span class="mp">$8</span></div>
+      <div class="menu-row"><span class="mn">Smoked Olives <em>— applewood smoked dashi</em></span><span class="mp">$8</span></div>
+      <div class="menu-row"><span class="mn">Nori Fries <em>— aonori, yuzu pepper mayo</em></span><span class="mp">$8</span></div>
+      <div class="menu-row"><span class="mn">Takoyaki <em>— tonkatsu, mayo, katsuobushi, aonori</em></span><span class="mp">$10</span></div>
+      <div class="menu-row"><span class="mn">Nagoya Sweet Soy Wings <em>— sesame cabbage salad</em></span><span class="mp">$11</span></div>
+      <div class="menu-row"><span class="mn">Aburi Shime Saba Sashimi <em>— yuzu ponzu, wasabi</em></span><span class="mp">$20</span></div>
+      <div class="menu-row"><span class="mn">Aburi Salmon Sushi <em>— torched, pressed</em></span><span class="mp">$18</span></div>
+      <div class="menu-row"><span class="mn">Saba Sushi <em>— cured mackerel, pressed</em></span><span class="mp">$18</span></div>
+      <div class="menu-row"><span class="mn">Yuzu Negitoro Pressed Sushi <em>— tuna, flying fish egg</em></span><span class="mp">$18</span></div>
+      <div class="menu-row"><span class="mn">Gyudon <em>— beef rice bowl, onsen tamago</em></span><span class="mp">$22</span></div>
+      <div class="menu-row"><span class="mn">Coffee Jelly <em>— dessert, cold brew, fresh cream</em></span><span class="mp">$11</span></div>
+    </div>
+
+    <div class="menu-list" data-menupanel="lunch">
+      <div class="menu-row"><span class="mn">Ebi Fry Sando <em>— panko prawns, tonkatsu, pickles</em></span><span class="mp">$15</span></div>
+      <div class="menu-row"><span class="mn">Gyudon <em>— simmered beef, egg, pickled ginger</em></span><span class="mp">$18</span></div>
+      <div class="menu-row"><span class="mn">Salmon Poke Don <em>— teriyaki, seaweed salad</em></span><span class="mp">$20</span></div>
+      <div class="menu-row"><span class="mn">Onigiri — Tuna-Mayo</span><span class="mp">$5</span></div>
+      <div class="menu-row"><span class="mn">Onigiri — Ume-Goma</span><span class="mp">$5</span></div>
+      <div class="menu-row"><span class="mn">Onigiri — Tsuke Salmon</span><span class="mp">$5</span></div>
+      <div class="menu-row"><span class="mn">Takoyaki</span><span class="mp">$10</span></div>
+      <div class="menu-row"><span class="mn">Nagoya Sweet Soy Wings</span><span class="mp">$11</span></div>
+      <div class="menu-row"><span class="mn">Matcha Beer</span><span class="mp">$11</span></div>
+      <div class="menu-row"><span class="mn">Sapporo</span><span class="mp">$9</span></div>
+      <div class="menu-row"><span class="mn">Toki Hi-Ball</span><span class="mp">$15</span></div>
+      <div class="menu-row"><span class="mn">Chu-Hi</span><span class="mp">$15</span></div>
+    </div>
+
+    <div class="menu-list" data-menupanel="cocktails">
+      <div class="menu-row"><span class="mn">Sombras <em>— tequila, passion tomato, sancho pepper, dill</em></span><span class="mp">MKT</span></div>
+      <div class="menu-row"><span class="mn">Under Current <em>— Lot 40 rye, sherry, black cardamom</em></span><span class="mp">MKT</span></div>
+      <div class="menu-row"><span class="mn">Clear <em>— gin, thai basil, pineapple, sichuan pepper</em></span><span class="mp">MKT</span></div>
+      <div class="menu-row"><span class="mn">Brown <em>— Jameson, lychee, black tea, ume</em></span><span class="mp">MKT</span></div>
+    </div>
+
+    <div class="menu-list" data-menupanel="coffee">
+      <div class="menu-row"><span class="mn">House Espresso</span><span class="mp">$4.5</span></div>
+      <div class="menu-row"><span class="mn">Slow Filter <em>— rotating single origin</em></span><span class="mp">$5.5</span></div>
+      <div class="menu-row"><span class="mn">Matcha Beer <em>— Asahi Super Dry, ceremonial matcha</em></span><span class="mp">$11</span></div>
+      <div class="menu-row"><span class="mn">El Paraiso 92 <em>— 250g bag, Colombia</em></span><span class="mp">$32</span></div>
+      <div class="menu-row"><span class="mn">Halo Beriti <em>— 250g bag, Ethiopia</em></span><span class="mp">$28</span></div>
+      <div class="menu-row"><span class="mn">Eduar Gaviria <em>— 250g bag, Colombia</em></span><span class="mp">$32</span></div>
+      <div class="menu-row"><span class="mn">Minas Gerais <em>— 250g bag, Brazil</em></span><span class="mp">$26</span></div>
+      <div class="menu-row"><span class="mn">Finca La Playita <em>— 250g bag, Colombia</em></span><span class="mp">$32</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="food">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">Dinner</div>
+      <h2>Small plates, pressed sushi, and a proper rice bowl — kitchen's open late.</h2>
+      <p class="sub">Served from 5pm. The full food menu runs until 1am, every day.</p>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card"><div class="photo"><img src="images/tsukemono.jpg" alt="Tsukemono"></div><div class="row"><h3>Tsukemono</h3><span class="price">$6</span></div><p>Assorted Japanese pickles.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/edamame.jpg" alt="Edamame"></div><div class="row"><h3>Edamame</h3><span class="price">$8</span></div><p>Boiled soy beans marinated in chili oil, soy konbu and sesame — served cold.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/smoked-olives.jpg" alt="Smoked Olives"></div><div class="row"><h3>Smoked Olives</h3><span class="price">$8</span></div><p>Applewood smoked dashi marinated olives.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/nori-fries.jpg" alt="Nori Fries"></div><div class="row"><h3>Nori Fries</h3><span class="price">$8</span></div><p>French fries, aonori, yuzu pepper mayo.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/takoyaki.jpg" alt="Takoyaki"></div><div class="row"><h3>Takoyaki</h3><span class="price">$10</span></div><p>Deep fried octopus balls with tonkatsu sauce, mayo, katsuobushi and aonori — 6pc.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/nagoya-sweet-soy-wings.jpg" alt="Nagoya Sweet Soy Wings"></div><div class="row"><h3>Nagoya Sweet Soy Wings</h3><span class="price">$11</span></div><p>½lb fried chicken wings, Nagoya sweet soy, sesame, black pepper & sesame-salted cabbage salad.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/aburi-shime-saba-sashimi.jpg" alt="Aburi Shime Saba Sashimi"></div><div class="row"><h3>Aburi Shime Saba Sashimi</h3><span class="price">$20</span></div><p>Cured Spanish mackerel, served in a light yuzu ponzu with red onions, scallions, yuzu kosho and wasabi.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/aburi-salmon-sushi.jpg" alt="Aburi Salmon Sushi"></div><div class="row"><h3>Aburi Salmon Sushi</h3><span class="price">$18</span></div><p>Torched salmon pressed sushi.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/saba-sushi.jpg" alt="Saba Sushi"></div><div class="row"><h3>Saba Sushi</h3><span class="price">$18</span></div><p>Cured Spanish mackerel pressed sushi.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/yuzu-negitoro-pressed-sushi.jpg" alt="Yuzu Negitoro Pressed Sushi"></div><div class="row"><h3>Yuzu Negitoro Pressed Sushi</h3><span class="price">$18</span></div><p>Marinated tuna, yuzu skin, flying fish egg, green onion.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/gyudon.jpg" alt="Gyudon"></div><div class="row"><h3>Gyudon</h3><span class="price">$22</span></div><p>Japanese beef rice bowl with onsen tamago.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/coffee-jelly.jpg" alt="Coffee Jelly"></div><div class="row"><h3>Coffee Jelly — Dessert</h3><span class="price">$11</span></div><p>915 house cold brew, fresh cream.</p></div>
+    </div>
+
+    <div class="menu-divider"><div class="line"></div><span class="mono">Lunch Menu — Dine-In</span><div class="line"></div></div>
+
+    <div class="menu-grid">
+      <div class="menu-card"><div class="photo"><img src="images/ebi-fry-sando.jpg" alt="Ebi Fry Sando"></div><div class="row"><h3>Ebi Fry Sando</h3><span class="price">$15</span></div><p>Panko breaded prawns, tonkatsu sauce, cabbage and tartar sauce, served with pickles.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/gyudon-lunch.jpg" alt="Gyudon lunch"></div><div class="row"><h3>Gyudon</h3><span class="price">$18</span></div><p>Japanese simmered beef bowl with rice, egg, pickled ginger & scallions.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/salmon-poke-don.jpg" alt="Salmon Poke Don"></div><div class="row"><h3>Salmon Poke Don</h3><span class="price">$20</span></div><p>Salmon, teriyaki, spicy seaweed salad, scallion, cucumber, sesame on sushi rice.</p></div>
+      <div class="menu-card"><div class="photo"><img src="images/onigiri.jpg" alt="Onigiri"></div><div class="row"><h3>Onigiri — 3 ways</h3><span class="price">$5 each</span></div><p>Tuna-Mayo · Ume-Goma (pickled plum & sesame) · Tsuke Salmon.</p></div>
+    </div>
+
+    <div class="drinks-strip">
+      <div class="drink-card">
+        <div class="dc-photo"><img src="images/matcha-beer.jpg" alt="Matcha Beer"></div>
+        <div class="dc-row"><span>Matcha Beer</span><span class="price">$11</span></div>
+      </div>
+      <div class="drink-card">
+        <div class="dc-photo dc-icon"><svg viewBox="0 0 60 80" width="46" height="62"><rect x="14" y="10" width="32" height="60" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="14" y="10" width="32" height="14" fill="currentColor" opacity=".15"/><line x1="14" y1="24" x2="46" y2="24" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="dc-row"><span>Sapporo</span><span class="price">$9</span></div>
+      </div>
+      <div class="drink-card">
+        <div class="dc-photo dc-icon"><svg viewBox="0 0 60 80" width="40" height="62"><path d="M20 12 L40 12 L36 70 L24 70 Z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="21.5" y1="34" x2="38.5" y2="34" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="dc-row"><span>Toki Hi-Ball</span><span class="price">$15</span></div>
+      </div>
+      <div class="drink-card">
+        <div class="dc-photo dc-icon"><svg viewBox="0 0 60 80" width="40" height="62"><rect x="18" y="18" width="24" height="52" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M22 18 v-6 a4 4 0 0 1 4 -4 h8 a4 4 0 0 1 4 4 v6" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+        <div class="dc-row"><span>Chu-Hi</span><span class="price">$15</span></div>
+      </div>
+    </div>
+    <p style="font-size:12px; opacity:.5; margin-top:14px;">Photography for Sapporo, Toki Hi-Ball and Chu-Hi wasn't in the material provided — send real shots any time and I'll swap these icons out.</p>
+  </div>
+</section>
+
+<section id="coffee">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">Coffee & Matcha</div>
+      <h2>Rotating single-origins, brewed by the cup, and bagged to take home.</h2>
+    </div>
+
+    <div class="coffee-photos">
+      <div class="ph"><img src="images/pour-over-coffee-at-915-dupont.jpg" alt="Pour-over coffee at 915 Dupont"></div>
+      <div class="ph"><img src="images/915-dupont-drinks.jpg" alt="915 Dupont drinks"></div>
+    </div>
+
+    <div class="bean-grid">
+      <div class="bean-card">
+        <div class="swatch" style="background:#B5852E;"><img src="images/el-paraiso-92.jpg" alt="El Paraiso 92"></div>
+        <div class="info"><div class="origin mono">Colombia · 250g</div><h3>El Paraiso 92</h3><p>Juicy lychee, layered berries, and a honeyed, wine-like finish.</p><div class="meta"><span>Washed, thermal shock</span><span class="price">$32</span></div></div>
+      </div>
+      <div class="bean-card">
+        <div class="swatch" style="background:#3D5A80;"><img src="images/halo-beriti.jpg" alt="Halo Beriti"></div>
+        <div class="info"><div class="origin mono">Ethiopia · 250g</div><h3>Halo Beriti</h3><p>Osmanthus-forward with white peach, citrus tea, and a clean finish.</p><div class="meta"><span>Washed</span><span class="price">$28</span></div></div>
+      </div>
+      <div class="bean-card">
+        <div class="swatch" style="background:#7A2E2E;"><img src="images/eduar-gaviria.jpg" alt="Eduar Gaviria"></div>
+        <div class="info"><div class="origin mono">Colombia · 250g</div><h3>Eduar Gaviria</h3><p>Tea-like florals with blueberry depth and a red wine finish.</p><div class="meta"><span>Anaerobic natural</span><span class="price">$32</span></div></div>
+      </div>
+      <div class="bean-card">
+        <div class="swatch" style="background:#6B4A2E;"><img src="images/minas-gerais.jpg" alt="Minas Gerais"></div>
+        <div class="info"><div class="origin mono">Brazil · 250g</div><h3>Minas Gerais</h3><p>Toffee and cocoa with roasted nut depth and a smooth finish.</p><div class="meta"><span>Natural</span><span class="price">$26</span></div></div>
+      </div>
+      <div class="bean-card">
+        <div class="swatch" style="background:#2F5443;"><img src="images/finca-la-playita.jpg" alt="Finca La Playita"></div>
+        <div class="info"><div class="origin mono">Colombia · 250g</div><h3>Finca La Playita</h3><p>Juicy cherry and mango with prickly pear brightness and round sweetness.</p><div class="meta"><span>Anaerobic natural</span><span class="price">$32</span></div></div>
+      </div>
+    </div>
+
+    <div class="matcha-beer">
+      <div class="ph"><img src="images/matcha-beer-2.jpg" alt="Matcha Beer"></div>
+      <div>
+        <div class="tag mono" style="opacity:.6; margin-bottom:12px;">House Signature</div>
+        <h3 class="display">Matcha Beer</h3>
+        <p>Asahi Super Dry, poured slow over Hokusan ceremonial grade matcha. Bitter, bright green, and nothing like you'd expect until you've had one.</p>
+        <span class="price-tag mono">$11</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cocktails">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">From The Bar</div>
+      <h2>A short, rotating list — each one built around a record.</h2>
+      <p class="sub">Every cocktail here is named for the album that inspired it. Ask the bartender what's playing.</p>
+    </div>
+    <div class="cocktail-grid">
+      <div class="cocktail-card">
+        <div class="ph"><img src="images/sombras-cocktail.jpg" alt="Sombras cocktail"></div>
+        <div>
+          <h3>Sombras</h3>
+          <div class="ingredients">Altos blanco tequila · passion tomato · sancho pepper · agave · dill</div>
+          <p>Bright and savory — the tomato reads as summer, not tomato. Sancho pepper opens warm and floral, then dill lands cool and green.</p>
+        </div>
+      </div>
+      <div class="cocktail-card">
+        <div class="ph"><img src="images/under-current-cocktail.jpg" alt="Under Current cocktail"></div>
+        <div>
+          <h3>Under Current</h3>
+          <div class="ingredients">Lot 40 Canadian rye · house tea blend · sherry · black cardamom · strawberry foam</div>
+          <p>Rye and sherry hold a slow weight underneath. Black cardamom warms the finish, then strawberry comes in light, almost shy.</p>
+        </div>
+      </div>
+      <div class="cocktail-card">
+        <div class="ph"><img src="images/clear-and-brown-cocktails.jpg" alt="Clear and Brown cocktails"></div>
+        <div>
+          <h3>Clear</h3>
+          <div class="ingredients">London dry gin · thai basil · pineapple · sichuan pepper</div>
+          <p>Green in the nose with a slow tingle at the back — bright and cool, built for a warm room.</p>
+        </div>
+      </div>
+      <div class="cocktail-card">
+        <div class="ph"><img src="images/house-martini.jpg" alt="House martini"></div>
+        <div>
+          <h3>Brown</h3>
+          <div class="ingredients">Jameson · lychee · black tea · ume · pinch of salt</div>
+          <p>Whiskey holds the ground, tea and lychee open up on top, and a pinch of salt keeps it honest.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cocktail-feature"><img src="images/cocktail-served-at-the-bar.jpg" alt="Cocktail served at the bar"></div>
+  </div>
+</section>
+
+<section id="shop">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">Take Home</div>
+      <h2>Merch and small goods from the room.</h2>
+    </div>
+    <div class="shop-grid">
+      <div class="shop-card"><div class="photo"><img src="images/blue-note-tee.jpg" alt="Blue Note Tee"></div><h4>Blue Note Tee</h4><div class="price">$40 CAD</div><button class="add-cart-btn mono" data-name="Blue Note Tee" data-price="40">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/rooms-listen-tee.jpg" alt="Rooms LISTEN Tee"></div><h4>Rooms | LISTEN Tee</h4><div class="price">$35 CAD</div><button class="add-cart-btn mono" data-name="Rooms LISTEN Tee" data-price="35">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/indigo-denim-tote-bag.jpg" alt="Indigo Denim Tote Bag"></div><h4>Indigo Denim Tote</h4><div class="price">$40 CAD</div><button class="add-cart-btn mono" data-name="Indigo Denim Tote" data-price="40">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/snake-mickey-tee.jpg" alt="Snake Mickey Tee"></div><h4>Snake Mickey Tee</h4><div class="price">$40 CAD</div><button class="add-cart-btn mono" data-name="Snake Mickey Tee" data-price="40">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/cream-baseball-cap.jpg" alt="Cream Baseball Cap"></div><h4>Cream Baseball Cap</h4><div class="price">$30 CAD</div><button class="add-cart-btn mono" data-name="Cream Baseball Cap" data-price="30">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/eyes-logo-mug.jpg" alt="Eyes Logo Mug"></div><h4>Eyes Logo Mug</h4><div class="price">$25 CAD</div><button class="add-cart-btn mono" data-name="Eyes Logo Mug" data-price="25">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/running-man-glass-cup.jpg" alt="Running Man Glass Cup"></div><h4>Running Man Glass Cup</h4><div class="price">$25 CAD</div><button class="add-cart-btn mono" data-name="Running Man Glass Cup" data-price="25">Add to Cart</button></div>
+      <div class="shop-card"><div class="photo"><img src="images/rooms-titanium-camping-mug.jpg" alt="Rooms Titanium Camping Mug"></div><h4>Titanium Camping Mug</h4><div class="price">$45 CAD</div><button class="add-cart-btn mono" data-name="Titanium Camping Mug" data-price="45">Add to Cart</button></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="tag mono">The Room</div>
+      <h2>A look inside.</h2>
+    </div>
+    <div class="ig-strip">
+      <img src="images/915-dupont-full-room.jpg" alt="915 Dupont full room">
+      <img src="images/dan-bartender-at-915-dupont.jpg" alt="Dan, bartender at 915 Dupont">
+      <img src="images/915-dupont-bar.jpg" alt="915 Dupont bar">
+      <img src="images/915-dupont-dinner-spread.jpg" alt="915 Dupont dinner spread">
+      <img src="images/915-dupont-entrance.jpg" alt="915 Dupont entrance">
+      <img src="images/915-dupont-lounge-seating.jpg" alt="915 Dupont lounge seating">
+    </div>
+  </div>
+</section>
+
+<section class="reserve-section" id="reserve">
+  <div class="wrap">
+    <div class="res-grid">
+      <div class="res-side">
+        <div class="tag mono" style="margin-bottom:16px; opacity:.55;">Reserve</div>
+        <h2 style="font-size:32px; margin-bottom:20px;">Save your seat before the room fills.</h2>
+        <p>Coffee is first-come. The Hi-Fi lounge fills up fast after 7pm, especially weekends — reserve ahead to make sure there's a seat with your name on it.</p>
+        <div class="info-line"><span class="label mono">Address</span><span>915 Dupont St, Toronto, ON M6H 1Z1</span></div>
+        <div class="info-line"><span class="label mono">Coffee</span><span>9:00 – 3:30 daily</span></div>
+        <div class="info-line"><span class="label mono">Bar</span><span>5:00pm – 2:00am daily</span></div>
+        <div class="info-line"><span class="label mono">Kitchen</span><span>Open late 'til 1am</span></div>
+      </div>
+      <form class="booking" id="bookingForm">
+        <div id="formFields">
+          <div class="field-row">
+            <div class="field"><label class="mono">Name</label><input type="text" required placeholder="Your name"></div>
+            <div class="field"><label class="mono">Phone or email</label><input type="text" required placeholder="For your confirmation"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label class="mono">Date</label><input type="date" id="resDate" required></div>
+            <div class="field"><label class="mono">Party size</label>
+              <select required><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
+            </div>
+          </div>
+          <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Which side of the room?</label>
+          <div class="chip-group" id="serviceChips">
+            <div class="chip" data-value="Coffee">Coffee, 9–3:30</div>
+            <div class="chip" data-value="Lounge">Hi-Fi Lounge, 5pm+</div>
+          </div>
+
+          <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Pre-order for your table (optional) — have it ready when you sit down</label>
+          <div class="preorder-grid" id="preorderGrid">
+            <div class="preorder-item" data-name="Edamame" data-price="8"><span>Edamame</span><span class="pp">$8</span></div>
+            <div class="preorder-item" data-name="Nori Fries" data-price="8"><span>Nori Fries</span><span class="pp">$8</span></div>
+            <div class="preorder-item" data-name="Takoyaki" data-price="10"><span>Takoyaki</span><span class="pp">$10</span></div>
+            <div class="preorder-item" data-name="Nagoya Sweet Soy Wings" data-price="11"><span>Nagoya Wings</span><span class="pp">$11</span></div>
+            <div class="preorder-item" data-name="Gyudon" data-price="22"><span>Gyudon</span><span class="pp">$22</span></div>
+            <div class="preorder-item" data-name="Salmon Poke Don" data-price="20"><span>Salmon Poke Don</span><span class="pp">$20</span></div>
+            <div class="preorder-item" data-name="Matcha Beer" data-price="11"><span>Matcha Beer</span><span class="pp">$11</span></div>
+            <div class="preorder-item" data-name="Toki Hi-Ball" data-price="15"><span>Toki Hi-Ball</span><span class="pp">$15</span></div>
+            <div class="preorder-item" data-name="Sombras" data-price="18"><span>Sombras</span><span class="pp">$18</span></div>
+            <div class="preorder-item" data-name="Coffee Jelly" data-price="11"><span>Coffee Jelly</span><span class="pp">$11</span></div>
+          </div>
+          <div class="preorder-total mono" id="preorderTotal">Pre-order total: $0</div>
+
+          <button type="submit" class="submit-btn">Reserve my table</button>
+        </div>
+        <div class="confirm" id="confirmBox">
+          <svg class="enso-mini" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"></circle></svg>
+          <h3 class="display">You're on the list.</h3>
+          <p>We'll confirm by the contact info you gave us. See you at 915 Dupont.</p>
+          <div id="confirmPreorder" class="confirm-preorder"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter">
+  <div class="wrap">
+    <h2 class="display">Stay Updated</h2>
+    <p>Sign up to receive the latest news, offers, and event information.</p>
+    <form class="news-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Joined ✓';">
+      <input type="email" placeholder="Email address" required>
+      <button type="submit" class="mono">Join Now</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="brand display">915 Dupont</div>
+      <div class="fine">Rooms Coffee — Toronto, Canada</div>
+    </div>
+    <div class="fcol">
+      <h5>Contact</h5>
+      <a href="mailto:915dupontcafe@gmail.com">915dupontcafe@gmail.com</a>
+      <a href="mailto:135ossington@gmail.com">135ossington@gmail.com</a>
+    </div>
+    <div class="fcol">
+      <h5>Explore</h5>
+      <a href="#food">Food Menu</a>
+      <a href="#coffee">Coffee</a>
+      <a href="#shop">Shop</a>
+      <a href="https://www.instagram.com/915dupont/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+  <div class="bottom">© 2026 Rooms Coffee | 915 Dupont. All rights reserved.</div>
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
