@@ -47,6 +47,33 @@ const body = document.body;
   });
 
   /* ---------- Menu tabs (consolidated Menu section) ---------- */
+  /* ---------- Mobile navigation ---------- */
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileNavClose = document.getElementById('mobileNavClose');
+  const mobileNavBackdrop = document.getElementById('mobileNavBackdrop');
+  const closeMobileNav = () => {
+    if(!mobileNav || !mobileMenuBtn) return;
+    mobileNav.classList.remove('open');
+    mobileMenuBtn.classList.remove('open');
+    mobileMenuBtn.setAttribute('aria-expanded','false');
+    mobileNav.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  };
+  const openMobileNav = () => {
+    if(!mobileNav || !mobileMenuBtn) return;
+    mobileNav.classList.add('open');
+    mobileMenuBtn.classList.add('open');
+    mobileMenuBtn.setAttribute('aria-expanded','true');
+    mobileNav.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  };
+  mobileMenuBtn?.addEventListener('click', () => mobileNav.classList.contains('open') ? closeMobileNav() : openMobileNav());
+  mobileNavClose?.addEventListener('click', closeMobileNav);
+  mobileNavBackdrop?.addEventListener('click', closeMobileNav);
+  mobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileNav));
+  document.getElementById('mobileLoginLink')?.addEventListener('click', () => { closeMobileNav(); openLogin(); });
+
   document.querySelectorAll('.menu-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
