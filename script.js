@@ -117,28 +117,57 @@ const body = document.body;
   const cartOverlay = document.getElementById('cartOverlay');
 
   function renderCart(){
+    const grouped = {};
+    cart.forEach(item => {
+      if(!grouped[item.name]) grouped[item.name] = {name:item.name,price:item.price,qty:0};
+      grouped[item.name].qty += 1;
+    });
+    const items = Object.values(grouped);
     cartCountEl.textContent = cart.length;
-    if(!cart.length){
+    if(!items.length){
       cartItemsEl.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
     } else {
-      cartItemsEl.innerHTML = cart.map((item, idx) => `
+      cartItemsEl.innerHTML = items.map(item => `
         <div class="cart-item">
-          <span>${item.name}</span>
-          <span style="display:flex; align-items:center; gap:10px;">
-            <span class="mono">$${item.price}</span>
-            <button class="ci-remove" data-idx="${idx}">&times;</button>
+          <span class="ci-name">${item.name}</span>
+          <span class="ci-controls">
+            <button class="ci-qty" data-action="minus" data-name="${item.name}" aria-label="Decrease ${item.name}">−</button>
+            <span class="ci-qty-value">${item.qty}</span>
+            <button class="ci-qty" data-action="plus" data-name="${item.name}" aria-label="Increase ${item.name}">+</button>
+            <span class="mono ci-line-total">$${item.price * item.qty}</span>
+            <button class="ci-remove" data-name="${item.name}" aria-label="Remove ${item.name}">&times;</button>
           </span>
         </div>`).join('');
     }
     const total = cart.reduce((s,i) => s + i.price, 0);
     cartTotalEl.textContent = `$${total}`;
+    cartItemsEl.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.name;
+        const index = cart.findIndex(i => i.name === name);
+        if(btn.dataset.action === 'plus'){
+          const item = cart.find(i => i.name === name);
+          if(item) cart.push({name:item.name,price:item.price});
+        } else if(index > -1) {
+          cart.splice(index,1);
+        }
+        renderCart();
+      });
+    });
     cartItemsEl.querySelectorAll('.ci-remove').forEach(btn => {
       btn.addEventListener('click', () => {
-        cart.splice(parseInt(btn.dataset.idx), 1);
+        cart = cart.filter(i => i.name !== btn.dataset.name);
         renderCart();
       });
     });
   }
+
+  window.addToCart = function(name, price){
+    cart.push({name, price});
+    renderCart();
+    showToast(`${name} added to cart`);
+    openCart();
+  };
 
   function openCart(){ cartDrawer.classList.add('open'); cartOverlay.classList.add('open'); }
   function closeCart(){ cartDrawer.classList.remove('open'); cartOverlay.classList.remove('open'); }
@@ -148,13 +177,10 @@ const body = document.body;
 
   document.querySelectorAll('.add-cart-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      cart.push({ name: btn.dataset.name, price: parseFloat(btn.dataset.price) });
-      renderCart();
+      window.addToCart(btn.dataset.name, parseFloat(btn.dataset.price));
       btn.textContent = 'Added ✓';
       btn.classList.add('added');
-      showToast(`${btn.dataset.name} added to cart`);
       setTimeout(() => { btn.textContent = 'Add to Cart'; btn.classList.remove('added'); }, 1200);
-      openCart();
     });
   });
 
