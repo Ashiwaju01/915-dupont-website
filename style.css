@@ -109,7 +109,7 @@
   .drink-line .price{ font-family:'JetBrains Mono',monospace; font-size:12px; opacity:.6; }
 
   /* ---------- COFFEE / BEANS ---------- */
-  .coffee-photos{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:60px; }
+  .coffee-photos{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:60px; }
   @media (max-width:640px){ .coffee-photos{ grid-template-columns:1fr; } }
   .coffee-photos .ph{ aspect-ratio:4/5; overflow:hidden; border-radius:2px; }
   .coffee-photos .ph img{ width:100%; height:100%; object-fit:cover; }
