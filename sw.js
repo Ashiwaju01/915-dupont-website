@@ -8,8 +8,10 @@ const CACHE_NAME = '915-dupont-cache-v2';
 // caching every single photo would make installs slow.
 const FILES_TO_CACHE = [
   'index.html',
-  'css/style.css',
-  'js/script.js',
+  'style.css',
+  'upgrade.css',
+  'script.js',
+  'coffee-details.js',
   'manifest.json'
 ];
 
