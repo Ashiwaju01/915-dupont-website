@@ -213,10 +213,20 @@ const body = document.body;
 
   document.getElementById('checkoutBtn').addEventListener('click', () => {
     if(!cart.length){ showToast('Your cart is empty'); return; }
-    showToast('Order placed — this is a demo checkout');
-    cart = [];
-    renderCart();
-    closeCart();
+    const coffeeUrls = {
+      "Finca La Playita":"https://roomscoffee.online/products/finca-la-playita",
+      "El Paraiso 92":"https://roomscoffee.online/products/el-paraiso-92",
+      "Minas Gerais":"https://roomscoffee.online/products/minas-gerais",
+      "Eduar Gaviria":"https://roomscoffee.online/products/eduar-gaviria",
+      "Halo Beriti":"https://roomscoffee.online/products/halo-beriti"
+    };
+    const uniqueNames = [...new Set(cart.map(i => i.name))];
+    if(uniqueNames.length === 1 && coffeeUrls[uniqueNames[0]]){
+      window.location.href = coffeeUrls[uniqueNames[0]];
+    } else {
+      window.open('https://roomscoffee.online/collections/coffee','_blank','noopener');
+      showToast('Rooms checkout opened — complete payment on the official store');
+    }
   });
 
   /* ---------- Toast ---------- */
