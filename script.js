@@ -432,3 +432,30 @@ const body = document.body;
 
   selectRoom('ossington');
 })();
+
+
+/* ---------- ROOMS editorial reveal + location-aware CTAs ---------- */
+(() => {
+  const revealItems = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {rootMargin:'0px 0px -10% 0px', threshold:.08});
+    revealItems.forEach(el => revealObserver.observe(el));
+  } else {
+    revealItems.forEach(el => el.classList.add('is-visible'));
+  }
+
+  document.querySelectorAll('[data-room-jump]').forEach(link => {
+    link.addEventListener('click', () => {
+      const key = link.dataset.roomJump;
+      const card = document.querySelector('.master-room-card[data-master-room="' + key + '"]');
+      card?.click();
+    });
+  });
+})();
