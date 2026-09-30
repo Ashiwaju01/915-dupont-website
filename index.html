@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>915 Dupont — Rooms Coffee</title>
+<title>ROOMS COFFEE — Toronto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -47,9 +47,9 @@
 <div class="toast" id="toast"></div>
 
 <nav>
-  <div class="brand display">915 DUPONT</div>
+  <div class="brand display">ROOMS COFFEE</div>
   <div class="navlinks">
-    <a href="#clocks">The Room</a>
+    <a href="#rooms-home">Home</a>
     <a href="#menu">Menu</a>
     <a href="#cocktails">Cocktails</a>
     <a href="#coffee">Coffee</a>
@@ -72,9 +72,9 @@
 <div class="mobile-nav" id="mobileNav" aria-hidden="true">
   <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
   <div class="mobile-nav-panel">
-    <div class="mobile-nav-top"><span class="mono">915 DUPONT</span><button id="mobileNavClose" type="button" aria-label="Close navigation">&times;</button></div>
+    <div class="mobile-nav-top"><span class="mono">ROOMS COFFEE</span><button id="mobileNavClose" type="button" aria-label="Close navigation">&times;</button></div>
     <div class="mobile-nav-links">
-      <a href="#clocks">The Room <span>01</span></a>
+      <a href="#rooms-home">Home <span>01</span></a>
       <a href="#menu">Menu <span>02</span></a>
       <a href="#cocktails">Cocktails <span>03</span></a>
       <a href="#coffee">Coffee <span>04</span></a>
@@ -84,10 +84,55 @@
     </div>
     <div class="mobile-nav-footer">
       <button id="mobileLoginLink" type="button">Log In</button>
-      <span>915 Dupont St · Toronto</span>
+      <span>Toronto · 3 Rooms</span>
     </div>
   </div>
 </div>
+
+<section id="rooms-home" class="rooms-master-hero">
+  <div class="rooms-master-bg">
+    <div class="rooms-master-grid">
+      <div class="rooms-master-copy">
+        <div class="mono rooms-master-kicker">ROOMS COFFEE · TORONTO</div>
+        <h1 class="display">Three rooms.<br>One idea of coffee.</h1>
+        <p>Explore Rooms by location — from the original neighbourhood café on Ossington, to the hi-fi room on Baldwin, to the late-night listening room on Dupont.</p>
+        <div class="rooms-master-actions">
+          <a class="btn btn-primary" href="#locations">Explore the rooms</a>
+          <a class="btn btn-ghost" href="#reserve">Reserve a visit</a>
+        </div>
+      </div>
+      <div class="rooms-master-stack">
+        <button class="master-room-card active" data-master-room="ossington">
+          <span class="mono">01</span><strong>135 Ossington</strong><small>Neighbourhood café · 8AM–6:30PM</small>
+        </button>
+        <button class="master-room-card" data-master-room="baldwin">
+          <span class="mono">02</span><strong>17 Baldwin</strong><small>Hi-fi coffee room · 8AM–6:30PM</small>
+        </button>
+        <button class="master-room-card" data-master-room="dupont">
+          <span class="mono">03</span><strong>915 Dupont</strong><small>Coffee by day · listening room by night</small>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="rooms-location-preview" id="rooms-preview">
+  <div class="wrap">
+    <div class="rooms-preview-media">
+      <img id="roomsPreviewImage" src="https://roomscoffee.online/cdn/shop/files/ECK_0068.00000000.jpg?v=1782836053&width=1800" alt="Rooms Coffee 135 Ossington">
+    </div>
+    <div class="rooms-preview-copy">
+      <div class="tag mono" id="roomsPreviewKicker">01 / OSSINGTON</div>
+      <h2 class="display" id="roomsPreviewTitle">Rooms 135 Ossington</h2>
+      <p id="roomsPreviewText">Where the Rooms story began — an Asian-inspired neighbourhood café built around thoughtful coffee, warm hospitality and a sense of home.</p>
+      <div class="rooms-preview-meta mono" id="roomsPreviewMeta">135 OSSINGTON AVE · 8AM–6:30PM</div>
+      <div class="rooms-preview-actions">
+        <a id="roomsPreviewReserve" href="#reserve" class="btn btn-primary">Reserve here</a>
+        <a id="roomsPreviewInstagram" href="https://www.instagram.com/135ossington/" target="_blank" rel="noopener" class="btn btn-ghost">Instagram ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="hero">
   <div class="hero-bg"><img src="915-dupont-noren-entrance.jpg" alt="915 Dupont noren entrance"></div>
@@ -141,7 +186,7 @@
           <div class="stat"><b>7</b><span>DAYS A WEEK</span></div>
         </div>
       </div>
-      <div class="clock-photo"><img src=" 915-dupont-daytime-interior.jpg" alt="915 Dupont daytime interior"></div>
+      <div class="clock-photo"><img src="915-dupont-daytime-interior.jpg" alt="915 Dupont daytime interior"></div>
     </div>
     <div class="clock-panel" data-panel="night">
       <div class="clock-copy">
@@ -395,66 +440,69 @@
   <div class="wrap">
     <div class="section-head">
       <div class="tag mono">ROOMS IN TORONTO</div>
-      <h2>Three rooms. Three different ways to spend time.</h2>
-      <p class="sub">The 915 Dupont experience is only one part of Rooms Coffee. Explore the other locations, then follow their live photo and video feeds.</p>
+      <h2>Choose the room before you choose the table.</h2>
+      <p class="sub">Rooms' current Toronto location directory lists 135 Ossington, 17 Baldwin and 915 Dupont. Each has its own rhythm, setting and reason to stay awhile.</p>
     </div>
-    <div class="locations-grid">
-      <article class="location-card location-ossington">
+
+    <div class="location-directory">
+      <article class="location-card location-ossington" data-location-card="ossington">
         <div class="location-number mono">01 / OSSINGTON</div>
-        <div class="location-visual"><span class="location-mark">135</span></div>
+        <div class="location-visual"><img src="https://roomscoffee.online/cdn/shop/files/ECK_0068.00000000.jpg?v=1782836053&width=1800" alt="Rooms 135 Ossington"></div>
         <div class="location-copy">
-          <h3>135 Ossington Ave</h3>
-          <p>Rooms' original home — a Japanese-inspired coffee space with multiple seating areas, a basement lounge, and a slower daytime rhythm.</p>
-          <div class="location-meta mono">8AM–6PM · DAILY</div>
+          <h3>Rooms 135 Ossington</h3>
+          <p>Where the Rooms story began — an Asian-inspired neighbourhood café built around warm hospitality, thoughtful coffee and a sense of home.</p>
+          <div class="location-meta mono">135 OSSINGTON AVE · 8AM–6:30PM</div>
           <div class="location-actions">
+            <button type="button" class="location-preview-btn" data-location-preview="ossington">Preview room</button>
+            <a href="https://www.instagram.com/135ossington/" target="_blank" rel="noopener">Instagram ↗</a>
             <a href="https://www.google.com/maps/search/?api=1&query=135%20Ossington%20Ave%2C%20Toronto%2C%20ON" target="_blank" rel="noopener">Directions ↗</a>
-            <a href="https://www.instagram.com/135ossington/" target="_blank" rel="noopener">Photos + video ↗</a>
           </div>
         </div>
       </article>
 
-      <article class="location-card location-dupont">
-        <div class="location-number mono">02 / DUPONT</div>
-        <div class="location-visual"><img src="915-dupont-full-room.jpg" alt="Rooms Coffee 915 Dupont interior"></div>
+      <article class="location-card location-baldwin" data-location-card="baldwin">
+        <div class="location-number mono">02 / BALDWIN</div>
+        <div class="location-visual"><img src="https://roomscoffee.online/cdn/shop/files/ECK_2976.jpg?v=1784651907&width=1800" alt="Rooms 17 Baldwin"></div>
         <div class="location-copy">
-          <h3>915 Dupont St</h3>
-          <p>Hi-fi Japanese kissa-inspired café cocktail bar — coffee by day, listening room and late-night bar after dark.</p>
-          <div class="location-meta mono">8AM–2AM · DAILY</div>
+          <h3>Rooms 17 Baldwin</h3>
+          <p>A hi-fi coffee room built around exceptional coffee, analog sound and thoughtful hospitality — a place for carefully brewed coffee and quiet connection.</p>
+          <div class="location-meta mono">17 BALDWIN ST · 8AM–6:30PM</div>
           <div class="location-actions">
+            <button type="button" class="location-preview-btn" data-location-preview="baldwin">Preview room</button>
+            <a href="https://www.instagram.com/17baldwinst/" target="_blank" rel="noopener">Instagram ↗</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=17%20Baldwin%20St%2C%20Toronto%2C%20ON" target="_blank" rel="noopener">Directions ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="location-card location-dupont" data-location-card="dupont">
+        <div class="location-number mono">03 / DUPONT</div>
+        <div class="location-visual"><img src="https://roomscoffee.online/cdn/shop/files/ECK_9279.jpg?v=1777675477&width=1800" alt="Rooms 915 Dupont"></div>
+        <div class="location-copy">
+          <h3>Rooms 915 Dupont</h3>
+          <p>A hi-fi Japanese kissa-inspired café cocktail bar — coffee and daytime service give way to listening, drinks and late nights.</p>
+          <div class="location-meta mono">915 DUPONT ST · 8AM–2AM</div>
+          <div class="location-actions">
+            <button type="button" class="location-preview-btn" data-location-preview="dupont">Preview room</button>
+            <a href="https://www.instagram.com/915dupont/" target="_blank" rel="noopener">Instagram ↗</a>
             <a href="https://www.google.com/maps/search/?api=1&query=915%20Dupont%20St%2C%20Toronto%2C%20ON" target="_blank" rel="noopener">Directions ↗</a>
-            <a href="https://www.instagram.com/915dupont/" target="_blank" rel="noopener">Photos + video ↗</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="location-card location-dufferin">
-        <div class="location-number mono">03 / DUFFERIN</div>
-        <div class="location-visual"><span class="location-mark">450</span></div>
-        <div class="location-copy">
-          <h3>450 Dufferin St · Bather</h3>
-          <p>A Rooms coffee counter inside Bather's Toronto space, pairing coffee and matcha with a brighter, design-forward retail environment.</p>
-          <div class="location-meta mono">8AM–4PM · DAILY</div>
-          <div class="location-actions">
-            <a href="https://www.google.com/maps/search/?api=1&query=450%20Dufferin%20St%2C%20Toronto%2C%20ON" target="_blank" rel="noopener">Directions ↗</a>
-            <a href="https://www.instagram.com/450dufferin/" target="_blank" rel="noopener">Photos + video ↗</a>
           </div>
         </div>
       </article>
     </div>
+
     <div class="location-media-note">
-      <span class="mono">MEDIA</span>
-      <span>We found active public photo/video feeds for 135 Ossington, 915 Dupont and 450 Dufferin. For a client-facing production site, we should use Rooms-owned assets or get permission before downloading/re-hosting third-party photography.</span>
+      <span class="mono">MEDIA PLAN</span>
+      <span>The location previews now use Rooms' own public site/CDN imagery. Instagram remains linked as the live social feed. For the final client-owned production site, we should replace these with Rooms-approved Instagram photos/reels downloaded with permission rather than scrape or re-host social content.</span>
     </div>
   </div>
-</section>
-
-<section class="reserve-section" id="reserve">
+</section><section class="reserve-section" id="reserve">
   <div class="wrap">
     <div class="res-grid">
       <div class="res-side">
-        <div class="tag mono" style="margin-bottom:16px; opacity:.55;">Reserve</div>
-        <h2 style="font-size:32px; margin-bottom:20px;">Save your seat before the room fills.</h2>
-        <p>Coffee is first-come. The Hi-Fi lounge fills up fast after 7pm, especially weekends — reserve ahead to make sure there's a seat with your name on it.</p>
+        <div class="tag mono" style="margin-bottom:16px; opacity:.55;">Reserve / Pre-order</div>
+        <h2 style="font-size:32px; margin-bottom:20px;">Choose your room, then choose your time.</h2>
+        <p>Tell us which Rooms location you want, when you are coming, and what you would like ready for your visit. Reservation and pre-order requests are kept together so the experience starts before you walk through the door.</p>
         <div class="info-line"><span class="label mono">Address</span><span>915 Dupont St, Toronto, ON M6H 1Z1</span></div>
         <div class="info-line"><span class="label mono">Coffee</span><span>9:00 – 3:30 daily</span></div>
         <div class="info-line"><span class="label mono">Bar</span><span>5:00pm – 2:00am daily</span></div>
@@ -472,13 +520,13 @@
               <select required><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
             </div>
           </div>
-          <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Which side of the room?</label>
+          <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Visit type</label>
           <div class="chip-group" id="serviceChips">
             <div class="chip" data-value="Coffee">Coffee, 9–3:30</div>
             <div class="chip" data-value="Lounge">Hi-Fi Lounge, 5pm+</div>
           </div>
 
-          <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Pre-order for your table (optional) — have it ready when you sit down</label>
+          <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Pre-order request (optional) — final availability is confirmed by Rooms</label>
           <div class="preorder-grid" id="preorderGrid">
             <div class="preorder-item" data-name="Edamame" data-price="8"><span>Edamame</span><span class="pp">$8</span></div>
             <div class="preorder-item" data-name="Nori Fries" data-price="8"><span>Nori Fries</span><span class="pp">$8</span></div>
@@ -517,11 +565,31 @@
   </div>
 </section>
 
+<div class="location-media-modal" id="locationMediaModal" aria-hidden="true">
+  <div class="location-media-backdrop" data-location-close></div>
+  <div class="location-media-panel">
+    <button class="location-media-close" type="button" data-location-close>&times;</button>
+    <div class="location-media-gallery">
+      <button type="button" class="location-gallery-prev" aria-label="Previous image">‹</button>
+      <img id="locationMediaImage" src="" alt="">
+      <button type="button" class="location-gallery-next" aria-label="Next image">›</button>
+    </div>
+    <div class="location-media-copy">
+      <div class="tag mono" id="locationMediaKicker"></div>
+      <h3 class="display" id="locationMediaTitle"></h3>
+      <p id="locationMediaText"></p>
+      <div class="location-media-actions">
+        <a id="locationMediaInstagram" href="#" target="_blank" rel="noopener" class="btn btn-primary">Open Instagram ↗</a>
+        <a href="#reserve" class="btn btn-ghost" data-location-reserve>Reserve this room</a>
+      </div>
+    </div>
+  </div>
+</div>
 <footer>
   <div class="wrap">
     <div>
-      <div class="brand display">915 Dupont</div>
-      <div class="fine">Rooms Coffee — Toronto, Canada</div>
+      <div class="brand display">ROOMS COFFEE</div>
+      <div class="fine">Rooms Coffee · Toronto, Canada</div>
     </div>
     <div class="fcol">
       <h5>Contact</h5>
@@ -530,7 +598,7 @@
     </div>
     <div class="fcol">
       <h5>Explore</h5>
-      <a href="#food">Food Menu</a>
+      <a href="#food">Food &amp; Drinks</a>
       <a href="#coffee">Coffee</a>
       <a href="#shop">Shop</a>
       <a href="#locations">Locations</a>
