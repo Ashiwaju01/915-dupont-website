@@ -321,3 +321,47 @@ body.night .coffee-related-card{border-color:var(--line-night)}
   .cocktail-card{grid-template-columns:40% 60%}
   .mobile-nav-links a{font-size:24px}
 }
+
+
+/* ===== ROOMS LOCATIONS + REAL CHECKOUT ===== */
+.cart-secure-note{font-size:10px;line-height:1.5;opacity:.55;margin:10px 0 12px}
+.locations-section{background:var(--day-bg);color:var(--ink-day)}
+body.night .locations-section{background:var(--night-bg);color:var(--ink-night)}
+.locations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.location-card{border:1px solid var(--line-day);background:rgba(255,255,255,.035);overflow:hidden;min-width:0}
+body.night .location-card{border-color:var(--line-night)}
+.location-number{font-size:9px;letter-spacing:.08em;opacity:.5;padding:13px 14px;border-bottom:1px solid var(--line-day)}
+body.night .location-number{border-color:var(--line-night)}
+.location-visual{height:270px;background:linear-gradient(145deg,#17120e,#5c3f28);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.location-visual img{width:100%;height:100%;object-fit:cover;display:block}
+.location-mark{font:600 clamp(70px,8vw,120px) 'Shippori Mincho',serif;color:rgba(244,237,225,.88);letter-spacing:-.08em}
+.location-ossington .location-visual{background:linear-gradient(135deg,#d6c5a5,#6b5138 70%,#201711)}
+.location-dufferin .location-visual{background:linear-gradient(135deg,#e4ded0,#b8c2b4 58%,#445047)}
+.location-copy{padding:20px}
+.location-copy h3{font:500 25px/1.1 'Shippori Mincho',serif;margin:0 0 10px}
+.location-copy p{font-size:12px;line-height:1.7;opacity:.68;margin:0 0 16px}
+.location-meta{font-size:9px;opacity:.5;padding-bottom:15px;border-bottom:1px solid var(--line-day)}
+body.night .location-meta{border-color:var(--line-night)}
+.location-actions{display:flex;gap:14px;flex-wrap:wrap;padding-top:14px}
+.location-actions a{font:9px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;text-decoration:underline;text-underline-offset:3px}
+.location-media-note{display:grid;grid-template-columns:90px 1fr;gap:18px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line-day);font-size:10px;line-height:1.7;opacity:.58}
+body.night .location-media-note{border-color:var(--line-night)}
+.coffee-buy-room{display:inline-flex;align-items:center;justify-content:center;border:1px solid currentColor;color:inherit;text-decoration:none;padding:13px 14px;font:9px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+@media(max-width:900px){
+  .locations-grid{grid-template-columns:1fr}
+  .location-card{display:grid;grid-template-columns:42% 58%}
+  .location-number{grid-column:1/-1}
+  .location-visual{height:100%;min-height:245px}
+  .location-copy{padding:18px}
+  .location-copy h3{font-size:21px}
+}
+@media(max-width:640px){
+  .locations-grid{gap:12px}
+  .location-card{display:block}
+  .location-visual{height:220px}
+  .location-copy h3{font-size:22px}
+  .location-copy p{font-size:11px}
+  .location-media-note{grid-template-columns:1fr;gap:5px}
+  .coffee-modal-actions{gap:8px;flex-wrap:wrap}
+  .coffee-add-cart,.coffee-buy-room{flex:1;min-width:0}
+}
