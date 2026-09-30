@@ -2,7 +2,7 @@
 // separate from your page. Its main job here: cache key files so the site
 // still loads (in a basic form) even with no internet connection.
 
-const CACHE_NAME = '915-dupont-cache-v2';
+const CACHE_NAME = '915-dupont-cache-v3';
 
 // Files to save for offline use. Keep this list to the essentials —
 // caching every single photo would make installs slow.
