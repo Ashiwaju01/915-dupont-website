@@ -1,6 +1,6 @@
 (() => {
   const coffees = {
-    "El Paraiso 92": {
+    "El Paraiso 92": {\n      storeUrl:"https://roomscoffee.online/products/el-paraiso-92",
       country:"Colombia", weight:"250g", price:32, region:"EL PARAISO", altitude:"2100 masl",
       variety:"Catuai", process:"Washed With Thermal Shock", harvest:"Spring 2025",
       notes:"Lychee, layered berries, honeyed sweetness, wine-like finish.",
@@ -12,7 +12,7 @@
         ["https://roomscoffee.online/cdn/shop/files/pasted-image-8.png?v=1771776501&width=1800","Coffee processing and drying"]
       ]
     },
-    "Halo Beriti": {
+    "Halo Beriti": {\n      storeUrl:"https://roomscoffee.online/products/halo-beriti",
       country:"Ethiopia", weight:"250g", price:28, region:"Halo Beriti", altitude:"1900–2000 masl",
       variety:"Heirloom", process:"Washed", harvest:"Spring 2025",
       notes:"Osmanthus, white peach, citrus tea, clean finish.",
@@ -24,7 +24,7 @@
         ["https://roomscoffee.online/cdn/shop/files/pasted-image-8.png?v=1771776501&width=1800","Coffee processing and drying"]
       ]
     },
-    "Eduar Gaviria": {
+    "Eduar Gaviria": {\n      storeUrl:"https://roomscoffee.online/products/eduar-gaviria",
       country:"Colombia", weight:"250g", price:32, region:"LA VILLA – EDUAR GAVIRIA", altitude:"1670 masl",
       variety:"Papayo", process:"Anaerobic Natural", harvest:"Fall 2025",
       notes:"Tea-like florals, blueberry depth, red wine finish.",
@@ -36,7 +36,7 @@
         ["https://roomscoffee.online/cdn/shop/files/pasted-image-8.png?v=1771776501&width=1800","Papayo processing and drying"]
       ]
     },
-    "Minas Gerais": {
+    "Minas Gerais": {\n      storeUrl:"https://roomscoffee.online/products/minas-gerais",
       country:"Brazil", weight:"250g", price:26, region:"MINAS GERAIS", altitude:"1200 masl",
       variety:"Red Catuaí", process:"Natural", harvest:"Summer 2025",
       notes:"Toffee, cocoa, roasted nuts, gentle sweetness.",
@@ -48,7 +48,7 @@
         ["https://roomscoffee.online/cdn/shop/files/pasted-image-8.png?v=1771776501&width=1800","Coffee processing and drying"]
       ]
     },
-    "Finca La Playita": {
+    "Finca La Playita": {\n      storeUrl:"https://roomscoffee.online/products/finca-la-playita",
       country:"Colombia", weight:"250g", price:32, region:"Finca La Playita", altitude:"1580 masl",
       variety:"Wush Wush", process:"Anaerobic Natural", harvest:"Fall 2025",
       notes:"Cherry, mango, prickly pear, melon, round sweetness.",
@@ -134,6 +134,7 @@
         </div>
         <div class="coffee-modal-actions">
           <button class="coffee-add-cart" type="button" id="coffeeAddCart">Add to Cart</button>
+          <a class="coffee-buy-room" id="coffeeBuyRoom" href="#" target="_blank" rel="noopener">Buy on Rooms ↗</a>
           <span class="mono coffee-modal-price" id="coffeeModalPrice"></span>
         </div>
         <div class="coffee-related">
@@ -156,6 +157,7 @@
   const price = overlay.querySelector("#coffeeModalPrice");
   const related = overlay.querySelector("#coffeeRelated");
   const addBtn = overlay.querySelector("#coffeeAddCart");
+  const buyRoom = overlay.querySelector("#coffeeBuyRoom");
   let current = null, currentIndex = 0;
 
   function setGallery(index) {
@@ -195,7 +197,8 @@
     setGallery(0);
     overlay.classList.add("open");
     document.body.classList.add("coffee-modal-open");
-    addBtn.textContent = `Add ${name} — $${current.price}`;
+    addBtn.textContent = `Add ${name} — ${current.price}`;
+    buyRoom.href = current.storeUrl;
     addBtn.onclick = () => {
       if (typeof window.addToCart === "function") {
         window.addToCart(name,current.price);
