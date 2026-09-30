@@ -511,19 +511,32 @@
       <form class="booking" id="bookingForm">
         <div id="formFields">
           <div class="field-row">
+            <div class="field"><label class="mono">Rooms location</label>
+              <select id="reservationLocation" required>
+                <option value="">Choose a location</option>
+                <option value="ossington">135 Ossington</option>
+                <option value="baldwin">17 Baldwin</option>
+                <option value="dupont">915 Dupont</option>
+              </select>
+            </div>
             <div class="field"><label class="mono">Name</label><input type="text" required placeholder="Your name"></div>
-            <div class="field"><label class="mono">Phone or email</label><input type="text" required placeholder="For your confirmation"></div>
           </div>
           <div class="field-row">
+            <div class="field"><label class="mono">Phone or email</label><input type="text" required placeholder="For your confirmation"></div>
             <div class="field"><label class="mono">Date</label><input type="date" id="resDate" required></div>
+          </div>
+          <div class="field-row">
             <div class="field"><label class="mono">Party size</label>
               <select required><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
             </div>
+            <div class="field"><label class="mono">Preferred time</label><input type="time" required></div>
           </div>
+
           <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Visit type</label>
           <div class="chip-group" id="serviceChips">
-            <div class="chip" data-value="Coffee">Coffee, 9–3:30</div>
-            <div class="chip" data-value="Lounge">Hi-Fi Lounge, 5pm+</div>
+            <div class="chip" data-value="Coffee">Coffee / daytime</div>
+            <div class="chip" data-value="Meal">Meal / table</div>
+            <div class="chip" data-value="Lounge">Listening / evening</div>
           </div>
 
           <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Pre-order request (optional) — final availability is confirmed by Rooms</label>
@@ -540,13 +553,12 @@
             <div class="preorder-item" data-name="Coffee Jelly" data-price="11"><span>Coffee Jelly</span><span class="pp">$11</span></div>
           </div>
           <div class="preorder-total mono" id="preorderTotal">Pre-order total: $0</div>
-
-          <button type="submit" class="submit-btn">Reserve my table</button>
+          <button type="submit" class="submit-btn">Send reservation request</button>
         </div>
         <div class="confirm" id="confirmBox">
           <svg class="enso-mini" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"></circle></svg>
-          <h3 class="display">You're on the list.</h3>
-          <p>We'll confirm by the contact info you gave us. See you at 915 Dupont.</p>
+          <h3 class="display">Request received.</h3>
+          <p>Rooms would confirm the final table, availability and any pre-order with you.</p>
           <div id="confirmPreorder" class="confirm-preorder"></div>
         </div>
       </form>
