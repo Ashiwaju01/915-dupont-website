@@ -545,9 +545,10 @@ body.night .location-media-panel{background:var(--night-bg);color:var(--ink-nigh
     overflow: visible !important;
   }
   .rooms-master-bg{
-    position:absolute;
-    inset:0;
-    min-height:100%;
+    position:relative !important;
+    inset:auto !important;
+    min-height:0 !important;
+    height:auto !important;
   }
   .rooms-master-grid{
     min-height:0 !important;
