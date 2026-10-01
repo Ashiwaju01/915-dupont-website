@@ -534,3 +534,105 @@ body.night .location-media-panel{background:var(--night-bg);color:var(--ink-nigh
 @media(prefers-reduced-motion:reduce){
  [data-reveal],.rooms-editorial-portrait img,.rooms-editorial-card img,.rooms-mood-card img{transition:none!important}
 }
+
+
+/* ===== FINAL MOBILE HERO FIX ===== */
+@media (max-width: 860px){
+  .rooms-master-hero{
+    min-height: auto !important;
+    height: auto !important;
+    padding: 92px 0 56px !important;
+    overflow: visible !important;
+  }
+  .rooms-master-bg{
+    position:absolute;
+    inset:0;
+    min-height:100%;
+  }
+  .rooms-master-grid{
+    min-height:0 !important;
+    height:auto !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    align-items:start !important;
+    gap:32px !important;
+    padding:0 18px !important;
+  }
+  .rooms-master-copy{
+    width:100%;
+    min-width:0;
+  }
+  .rooms-master-copy h1{
+    display:block;
+    width:100%;
+    max-width:none !important;
+    font-size:clamp(46px,12.8vw,64px) !important;
+    line-height:.94 !important;
+    letter-spacing:-.045em;
+    overflow:visible !important;
+    white-space:normal !important;
+    word-break:normal !important;
+  }
+  .rooms-master-copy p{
+    width:100%;
+    max-width:38ch !important;
+    font-size:14px !important;
+    line-height:1.7 !important;
+    margin-top:20px !important;
+  }
+  .rooms-master-actions{
+    width:100%;
+    margin-top:24px !important;
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    gap:8px !important;
+  }
+  .rooms-master-actions .btn{
+    width:100%;
+    box-sizing:border-box;
+    text-align:center;
+    padding:13px 10px !important;
+    font-size:9px !important;
+  }
+  .rooms-master-stack{
+    width:100%;
+    max-width:none !important;
+    display:grid !important;
+    gap:8px !important;
+  }
+  .master-room-card{
+    width:100%;
+    box-sizing:border-box;
+    min-height:76px;
+    padding:15px !important;
+    grid-template-columns:34px minmax(0,1fr) !important;
+    gap:4px 9px !important;
+  }
+  .master-room-card strong{
+    font-size:18px !important;
+    line-height:1.15;
+  }
+  .master-room-card small{
+    font-size:9px !important;
+    line-height:1.45;
+  }
+}
+
+@media (max-width: 390px){
+  .rooms-master-hero{
+    padding-top:88px !important;
+  }
+  .rooms-master-grid{
+    padding:0 15px !important;
+    gap:28px !important;
+  }
+  .rooms-master-copy h1{
+    font-size:44px !important;
+  }
+  .rooms-master-copy p{
+    font-size:13px !important;
+  }
+  .rooms-master-actions{
+    grid-template-columns:1fr !important;
+  }
+}
