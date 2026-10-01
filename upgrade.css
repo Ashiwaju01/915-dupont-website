@@ -536,6 +536,13 @@ body.night .location-media-panel{background:var(--night-bg);color:var(--ink-nigh
 }
 
 
+/* FINAL HERO THREE-ROOM VISIBILITY */
+.rooms-master-hero{overflow:visible !important;}
+.rooms-master-bg{overflow:visible !important;}
+.rooms-master-grid{min-height:auto !important;align-items:start !important;}
+.rooms-master-stack{height:auto !important;min-height:0 !important;overflow:visible !important;}
+.master-room-card{display:grid !important;visibility:visible !important;opacity:1 !important;}
+
 /* ===== FINAL MOBILE HERO FIX ===== */
 @media (max-width: 860px){
   .rooms-master-hero{
@@ -635,5 +642,50 @@ body.night .location-media-panel{background:var(--night-bg);color:var(--ink-nigh
   }
   .rooms-master-actions{
     grid-template-columns:1fr !important;
+  }
+}
+
+
+/* FINAL RESERVATION CONTROL VISIBILITY */
+.confirm .enso-mini{width:72px !important;height:72px !important;margin:0 auto 16px;display:block;overflow:visible;}
+.confirm .enso-mini .check-circle{fill:none;stroke:var(--hanko);stroke-width:3.5;stroke-dasharray:none;stroke-dashoffset:0;animation:none;}
+.confirm .enso-mini .check-mark{fill:none;stroke:var(--hanko);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:55;stroke-dashoffset:55;animation:drawCheck .45s ease .15s forwards;}
+@keyframes drawCheck{to{stroke-dashoffset:0;}}
+
+.field input[type="date"],
+.field input[type="time"],
+.field select.reservation-party{
+  min-height:46px;
+  font-size:15px !important;
+  line-height:1.2;
+  cursor:pointer;
+  -webkit-appearance:auto;
+  appearance:auto;
+  color-scheme:light;
+}
+.field select.reservation-party{
+  color:#16110d !important;
+  background:#fff;
+}
+.field select.reservation-party option{
+  color:#16110d;
+  background:#fff;
+}
+body.night .field input[type="date"],
+body.night .field input[type="time"]{color-scheme:dark;}
+body.night .field select.reservation-party{
+  color:#f4ede1 !important;
+  background:#16110d;
+}
+body.night .field select.reservation-party option{
+  color:#f4ede1;
+  background:#16110d;
+}
+@media(max-width:600px){
+  .field input[type="date"],
+  .field input[type="time"],
+  .field select.reservation-party{
+    min-height:48px;
+    font-size:16px !important;
   }
 }
