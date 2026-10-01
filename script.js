@@ -334,12 +334,18 @@ const body = document.body;
       }
 
       /*
-       * GitHub Pages cannot create a Shopify multi-line cart by itself because
-       * Shopify requires the store's live variant IDs. Never discard a mixed
-       * cart by redirecting to a generic collection.
+       * GitHub Pages cannot create a Shopify multi-line cart without the
+       * store's live variant IDs. Do not pretend a mixed cart was transferred.
+       * Instead, open the first selected product and keep this cart intact so
+       * the customer can open the remaining selected products from their links.
        */
-      window.open(`${ROOMS_STORE}/collections/gift-shop`, '_blank', 'noopener');
-      showToast('Your cart is saved. Open each selected item on Rooms to complete the order.');
+      const firstUrl = urls[0];
+      if(firstUrl){
+        window.open(firstUrl, '_blank', 'noopener');
+        showToast('Your cart is saved. Open the other selected items from this cart.');
+      } else {
+        showToast('Your selections are saved. Open the Rooms store to complete your order.');
+      }
     });
   }
 
