@@ -34,6 +34,26 @@ const body = document.body;
   }
   setupChipGroup('serviceChips');
 
+  /* ---------- Reservation date/time controls ---------- */
+  (() => {
+    const dateInput = document.getElementById('resDate');
+    const timeInput = document.getElementById('reservationTime');
+    const today = new Date();
+    const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+
+    if (dateInput) {
+      dateInput.min = localToday;
+      dateInput.addEventListener('click', () => {
+        try { dateInput.showPicker?.(); } catch (_) {}
+      });
+    }
+    if (timeInput) {
+      timeInput.addEventListener('click', () => {
+        try { timeInput.showPicker?.(); } catch (_) {}
+      });
+    }
+  })();
+
   /* ---------- FIX: in-page anchor navigation (prevents full navigation / "new chat" behaviour) ---------- */
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
@@ -125,13 +145,31 @@ const body = document.body;
 
   document.getElementById('bookingForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    const dateEl = document.getElementById('resDate');
+    const timeEl = document.getElementById('reservationTime');
+    const partyEl = document.getElementById('reservationPartySize');
+    const confirmBox = document.getElementById('confirmBox');
+    const confirmText = confirmBox?.querySelector('p');
+    const locationEl = document.getElementById('reservationLocation');
+
     document.getElementById('formFields').style.display = 'none';
-    document.getElementById('confirmBox').classList.add('show');
+    confirmBox?.classList.add('show');
+
+    if (confirmText) {
+      const room = locationEl?.selectedOptions?.[0]?.textContent || 'Rooms';
+      const party = partyEl?.value || '';
+      const date = dateEl?.value || '';
+      const time = timeEl?.value || '';
+      confirmText.textContent = `Your request for ${room} is saved for ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. Rooms would confirm final availability and any pre-order with you.`;
+    }
+
     const cp = document.getElementById('confirmPreorder');
     if(preorderItems.length){
       let html = '<div class="mono" style="font-size:11px; opacity:.6; margin-bottom:8px;">Pre-order</div>';
-      preorderItems.forEach(i => { html += `<div class="cp-row"><span>${i.name}</span><span>$${i.price}</span></div>`; });
+      preorderItems.forEach(i => { html += `<div class="cp-row"><span>${i.name}</span><span>${i.price}</span></div>`; });
       cp.innerHTML = html;
+    } else if (cp) {
+      cp.innerHTML = '';
     }
   });
 
