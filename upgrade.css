@@ -543,6 +543,17 @@ body.night .location-media-panel{background:var(--night-bg);color:var(--ink-nigh
 .rooms-master-stack{height:auto !important;min-height:0 !important;overflow:visible !important;}
 .master-room-card{display:grid !important;visibility:visible !important;opacity:1 !important;}
 
+/* Keep the location cards vertically aligned with the hero copy on desktop */
+@media (min-width: 861px){
+  .rooms-master-grid{
+    align-items:start !important;
+    padding-top:24px !important;
+  }
+  .rooms-master-stack{
+    align-self:start !important;
+    margin-top:0 !important;
+  }
+}
 /* ===== FINAL MOBILE HERO FIX ===== */
 @media (max-width: 860px){
   .rooms-master-hero{
