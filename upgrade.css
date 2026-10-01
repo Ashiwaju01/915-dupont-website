@@ -700,3 +700,14 @@ body.night .field select.reservation-party option{
     font-size:16px !important;
   }
 }
+
+/* ---------- Cart product links ---------- */
+.cart-item{align-items:flex-start !important;}
+.ci-name-wrap{display:flex;flex-direction:column;gap:5px;min-width:0;max-width:42%;}
+.ci-name-wrap .ci-name{max-width:none;line-height:1.35;}
+.ci-room-link{font-size:8px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;opacity:.62;white-space:nowrap;}
+.ci-room-link:hover{opacity:1;text-decoration:underline;}
+@media(max-width:600px){
+  .ci-name-wrap{max-width:38%;}
+  .ci-room-link{font-size:7px;}
+}
