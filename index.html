@@ -619,13 +619,13 @@
           </div>
           <div class="field-row">
             <div class="field"><label class="mono">Phone or email</label><input type="text" required placeholder="For your confirmation"></div>
-            <div class="field"><label class="mono">Date</label><input type="date" id="resDate" required></div>
+            <div class="field"><label class="mono">Date</label><input type="date" id="resDate" class="reservation-date" required></div>
           </div>
           <div class="field-row">
             <div class="field"><label class="mono">Party size</label>
-              <select required><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
+              <select id="reservationPartySize" class="reservation-party" required><option value="">Select</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6+">6+</option></select>
             </div>
-            <div class="field"><label class="mono">Preferred time</label><input type="time" required></div>
+            <div class="field"><label class="mono">Preferred time</label><input type="time" id="reservationTime" class="reservation-time" required></div>
           </div>
 
           <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Visit type</label>
@@ -652,7 +652,7 @@
           <button type="submit" class="submit-btn">Send reservation request</button>
         </div>
         <div class="confirm" id="confirmBox">
-          <svg class="enso-mini" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"></circle></svg>
+          <svg class="enso-mini" viewBox="0 0 64 64" aria-hidden="true"><circle class="check-circle" cx="32" cy="32" r="27"></circle><path class="check-mark" d="M19 33.5 28 42l18-20"></path></svg>
           <h3 class="display">Request received.</h3>
           <p>Rooms would confirm the final table, availability and any pre-order with you.</p>
           <div id="confirmPreorder" class="confirm-preorder"></div>
