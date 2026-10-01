@@ -174,61 +174,130 @@ const body = document.body;
   });
 
   /* ---------- Cart ---------- */
-  let cart = [];
+  const ROOMS_STORE = 'https://roomscoffee.online';
+  const PRODUCT_CATALOG = {
+    "Finca La Playita": { price:32, url:`${ROOMS_STORE}/products/finca-la-playita` },
+    "El Paraiso 92": { price:32, url:`${ROOMS_STORE}/products/el-paraiso-92` },
+    "Minas Gerais": { price:26, url:`${ROOMS_STORE}/products/minas-gerais` },
+    "Eduar Gaviria": { price:32, url:`${ROOMS_STORE}/products/eduar-gaviria` },
+    "Halo Beriti": { price:28, url:`${ROOMS_STORE}/products/halo-beriti` },
+    "Blue Note Tee": { price:40, url:`${ROOMS_STORE}/products/rooms-blue-note-t-shirt` },
+    "Rooms LISTEN Tee": { price:35, url:`${ROOMS_STORE}/products/rooms-coffee-listen-tee` },
+    "Indigo Denim Tote": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
+    "Indigo Denim Tote Bag": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
+    "Snake Mickey Tee": { price:40, url:`${ROOMS_STORE}/products/snake-micky-tee` },
+    "Cream Baseball Cap": { price:30, url:`${ROOMS_STORE}/products/rooms-baseball-cap` },
+    "Navy Baseball Cap": { price:30, url:`${ROOMS_STORE}/products/rooms-blue-baseball-cap` },
+    "Eyes Logo Mug": { price:25, url:`${ROOMS_STORE}/products/rooms-classic-ceramic-mug` },
+    "Running Man Glass Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-running-man-glass-cup` },
+    "Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` },
+    "Rooms Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` }
+  };
+
   const cartCountEl = document.getElementById('cartCount');
   const cartItemsEl = document.getElementById('cartItems');
   const cartTotalEl = document.getElementById('cartTotal');
   const cartDrawer = document.getElementById('cartDrawer');
   const cartOverlay = document.getElementById('cartOverlay');
+  const CART_KEY = 'rooms-demo-cart-v2';
+
+  let cart = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    if (Array.isArray(saved)) cart = saved.filter(i => i && i.name && Number.isFinite(Number(i.price)));
+  } catch (_) {}
+
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+
+  function saveCart(){
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (_) {}
+  }
+
+  function getProductMeta(name, price){
+    const catalog = PRODUCT_CATALOG[name];
+    return {
+      price: Number(catalog?.price ?? price ?? 0),
+      url: catalog?.url || null
+    };
+  }
 
   function renderCart(){
     const grouped = {};
     cart.forEach(item => {
-      if(!grouped[item.name]) grouped[item.name] = {name:item.name,price:item.price,qty:0};
+      if(!grouped[item.name]) {
+        const meta = getProductMeta(item.name, item.price);
+        grouped[item.name] = {name:item.name,price:meta.price,url:meta.url,qty:0};
+      }
       grouped[item.name].qty += 1;
     });
     const items = Object.values(grouped);
     cartCountEl.textContent = cart.length;
+
     if(!items.length){
       cartItemsEl.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
     } else {
-      cartItemsEl.innerHTML = items.map(item => `
+      cartItemsEl.innerHTML = items.map(item => {
+        const name = escapeHtml(item.name);
+        const roomLink = item.url
+          ? `<a class="ci-room-link mono" href="${item.url}" target="_blank" rel="noopener">View on Rooms ↗</a>`
+          : '';
+        return `
         <div class="cart-item">
-          <span class="ci-name">${item.name}</span>
+          <div class="ci-name-wrap">
+            <span class="ci-name">${name}</span>
+            ${roomLink}
+          </div>
           <span class="ci-controls">
-            <button class="ci-qty" data-action="minus" data-name="${item.name}" aria-label="Decrease ${item.name}">−</button>
+            <button class="ci-qty" data-action="minus" data-name="${name}" aria-label="Decrease ${name}">−</button>
             <span class="ci-qty-value">${item.qty}</span>
-            <button class="ci-qty" data-action="plus" data-name="${item.name}" aria-label="Increase ${item.name}">+</button>
-            <span class="mono ci-line-total">$${item.price * item.qty}</span>
-            <button class="ci-remove" data-name="${item.name}" aria-label="Remove ${item.name}">&times;</button>
+            <button class="ci-qty" data-action="plus" data-name="${name}" aria-label="Increase ${name}">+</button>
+            <span class="mono ci-line-total">${item.price * item.qty}</span>
+            <button class="ci-remove" data-name="${name}" aria-label="Remove ${name}">&times;</button>
           </span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
-    const total = cart.reduce((s,i) => s + i.price, 0);
-    cartTotalEl.textContent = `$${total}`;
+
+    const total = cart.reduce((s,i) => s + Number(i.price || 0), 0);
+    cartTotalEl.textContent = `${total}`;
+
     cartItemsEl.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => {
         const name = btn.dataset.name;
         const index = cart.findIndex(i => i.name === name);
         if(btn.dataset.action === 'plus'){
           const item = cart.find(i => i.name === name);
-          if(item) cart.push({name:item.name,price:item.price});
+          if(item) cart.push({...item});
         } else if(index > -1) {
           cart.splice(index,1);
         }
+        saveCart();
         renderCart();
       });
     });
+
     cartItemsEl.querySelectorAll('.ci-remove').forEach(btn => {
       btn.addEventListener('click', () => {
         cart = cart.filter(i => i.name !== btn.dataset.name);
+        saveCart();
         renderCart();
       });
     });
   }
 
   window.addToCart = function(name, price){
-    cart.push({name, price});
+    const meta = getProductMeta(name, price);
+    const existing = cart.find(item => item.name === name);
+    if(existing) {
+      existing.price = meta.price;
+      existing.url = meta.url;
+      cart.push({...existing});
+    } else {
+      cart.push({name, price:meta.price, url:meta.url});
+    }
+    saveCart();
     renderCart();
     showToast(`${name} added to cart`);
     openCart();
@@ -249,23 +318,32 @@ const body = document.body;
     });
   });
 
-  document.getElementById('checkoutBtn').addEventListener('click', () => {
-    if(!cart.length){ showToast('Your cart is empty'); return; }
-    const coffeeUrls = {
-      "Finca La Playita":"https://roomscoffee.online/products/finca-la-playita",
-      "El Paraiso 92":"https://roomscoffee.online/products/el-paraiso-92",
-      "Minas Gerais":"https://roomscoffee.online/products/minas-gerais",
-      "Eduar Gaviria":"https://roomscoffee.online/products/eduar-gaviria",
-      "Halo Beriti":"https://roomscoffee.online/products/halo-beriti"
-    };
-    const uniqueNames = [...new Set(cart.map(i => i.name))];
-    if(uniqueNames.length === 1 && coffeeUrls[uniqueNames[0]]){
-      window.location.href = coffeeUrls[uniqueNames[0]];
-    } else {
-      window.open('https://roomscoffee.online/collections/coffee','_blank','noopener');
-      showToast('Rooms checkout opened — complete payment on the official store');
-    }
-  });
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+      if(!cart.length){ showToast('Your cart is empty'); return; }
+
+      const uniqueNames = [...new Set(cart.map(i => i.name))];
+      const urls = uniqueNames
+        .map(name => getProductMeta(name, 0).url)
+        .filter(Boolean);
+
+      if(uniqueNames.length === 1 && urls[0]){
+        window.location.href = urls[0];
+        return;
+      }
+
+      /*
+       * GitHub Pages cannot create a Shopify multi-line cart by itself because
+       * Shopify requires the store's live variant IDs. Never discard a mixed
+       * cart by redirecting to a generic collection.
+       */
+      window.open(`${ROOMS_STORE}/collections/gift-shop`, '_blank', 'noopener');
+      showToast('Your cart is saved. Open each selected item on Rooms to complete the order.');
+    });
+  }
+
+  renderCart();
 
   /* ---------- Toast ---------- */
   let toastTimer;
