@@ -551,7 +551,7 @@ body.night .location-media-panel{background:var(--night-bg);color:var(--ink-nigh
   }
   .rooms-master-stack{
     align-self:start !important;
-    margin-top:0 !important;
+    margin-top:72px !important;
   }
 }
 /* ===== FINAL MOBILE HERO FIX ===== */
