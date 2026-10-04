@@ -548,3 +548,136 @@ const body = document.body;
     });
   });
 })();
+
+/* ---------- Shared image viewer: menu, shop, coffee, cocktails, locations + editorial media ---------- */
+(() => {
+  const viewer = document.getElementById('mediaViewer');
+  if (!viewer) return;
+
+  const imageEl = document.getElementById('mediaViewerImage');
+  const kickerEl = document.getElementById('mediaViewerKicker');
+  const titleEl = document.getElementById('mediaViewerTitle');
+  const descEl = document.getElementById('mediaViewerDescription');
+  const metaEl = document.getElementById('mediaViewerMeta');
+  const counterEl = document.getElementById('mediaViewerCounter');
+  const prevBtn = viewer.querySelector('.media-viewer-prev');
+  const nextBtn = viewer.querySelector('.media-viewer-next');
+
+  let items = [];
+  let index = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  const clean = value => (value || '').replace(/\s+/g,' ').trim();
+
+  function getDetails(img) {
+    const card = img.closest('.menu-card,.shop-card,.bean-card,.cocktail-card,.drink-card,.location-card,.rooms-mood-card,.rooms-editorial-portrait,.rooms-editorial-card,.clock-photo,.matcha-beer,.rooms-sound-image,.coffee-photos,.ig-strip,.hero,.hero-bg,.location-visual');
+    if (!card) return { kicker:'ROOMS COFFEE', title:img.alt || 'Rooms Coffee', desc:'', meta:'' };
+
+    const title = clean(
+      card.querySelector('h3,h4,.rooms-mood-card h3,.location-copy h3,.rooms-editorial-copy h3')?.textContent ||
+      img.alt ||
+      'Rooms Coffee'
+    );
+
+    const price = clean(card.querySelector('.price,.mp,.price-tag')?.textContent);
+    const origin = clean(card.querySelector('.origin,.meta')?.textContent);
+    const description = clean(card.querySelector('p')?.textContent);
+    const locationMeta = clean(card.querySelector('.location-meta,.rooms-preview-meta')?.textContent);
+
+    let kicker = 'ROOMS COFFEE';
+    if (card.classList.contains('shop-card')) kicker = 'TAKE HOME / GIFT SHOP';
+    else if (card.classList.contains('menu-card') || card.classList.contains('drink-card')) kicker = 'MENU / 915 DUPONT';
+    else if (card.classList.contains('bean-card')) kicker = 'COFFEE / SINGLE ORIGIN';
+    else if (card.classList.contains('cocktail-card')) kicker = 'FROM THE BAR';
+    else if (card.classList.contains('location-card')) kicker = clean(card.querySelector('.location-number')?.textContent);
+    else if (card.classList.contains('rooms-mood-card')) kicker = 'THE ROOMS';
+    else if (card.classList.contains('clock-photo')) kicker = '915 DUPONT / DAY & NIGHT';
+    else if (card.classList.contains('ig-strip')) kicker = 'ROOMS / GALLERY';
+    else if (card.classList.contains('coffee-photos') || card.classList.contains('matcha-beer')) kicker = 'COFFEE & MATCHA';
+
+    return {
+      kicker,
+      title,
+      desc: description,
+      meta: [origin, price, locationMeta].filter(Boolean).join(' · ')
+    };
+  }
+
+  function getGroup(img) {
+    const section = img.closest('section');
+    if (!section) return [img];
+    const candidates = [...section.querySelectorAll('img:not(.no-preview)')];
+    return candidates.length ? candidates : [img];
+  }
+
+  function render() {
+    const img = items[index];
+    if (!img) return;
+    const details = getDetails(img);
+    imageEl.src = img.currentSrc || img.src;
+    imageEl.alt = img.alt || details.title;
+    kickerEl.textContent = details.kicker;
+    titleEl.textContent = details.title;
+    descEl.textContent = details.desc;
+    metaEl.textContent = details.meta;
+    counterEl.textContent = String(index + 1).padStart(2,'0') + ' / ' + String(items.length).padStart(2,'0');
+    prevBtn.hidden = items.length < 2;
+    nextBtn.hidden = items.length < 2;
+  }
+
+  function open(img) {
+    items = getGroup(img);
+    index = Math.max(0, items.indexOf(img));
+    render();
+    viewer.classList.add('open');
+    viewer.setAttribute('aria-hidden','false');
+    document.body.classList.add('media-viewer-open');
+  }
+
+  function close() {
+    viewer.classList.remove('open');
+    viewer.setAttribute('aria-hidden','true');
+    document.body.classList.remove('media-viewer-open');
+  }
+
+  function step(direction) {
+    if (items.length < 2) return;
+    index = (index + direction + items.length) % items.length;
+    render();
+  }
+
+  document.addEventListener('click', e => {
+    if (viewer.classList.contains('open')) return;
+    const img = e.target.closest('img:not(.no-preview)');
+    if (!img || img.closest('.media-viewer') || img.closest('.location-media-modal')) return;
+    e.preventDefault();
+    open(img);
+  });
+
+  viewer.addEventListener('click', e => {
+    if (e.target.closest('[data-media-close]')) close();
+  });
+  prevBtn?.addEventListener('click', () => step(-1));
+  nextBtn?.addEventListener('click', () => step(1));
+
+  const stage = viewer.querySelector('.media-viewer-stage');
+  stage?.addEventListener('touchstart', e => {
+    const t = e.changedTouches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+  }, {passive:true});
+  stage?.addEventListener('touchend', e => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+  }, {passive:true});
+
+  document.addEventListener('keydown', e => {
+    if (!viewer.classList.contains('open')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+})();
