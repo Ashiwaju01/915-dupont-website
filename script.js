@@ -92,8 +92,7 @@ const body = document.body;
   mobileNavClose?.addEventListener('click', closeMobileNav);
   mobileNavBackdrop?.addEventListener('click', closeMobileNav);
   mobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileNav));
-  document.getElementById('mobileLoginLink')?.addEventListener('click', () => { closeMobileNav(); openLogin(); });
-
+  
   document.querySelectorAll('.menu-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
@@ -160,7 +159,7 @@ const body = document.body;
       const party = partyEl?.value || '';
       const date = dateEl?.value || '';
       const time = timeEl?.value || '';
-      confirmText.textContent = `Your request for ${room} is saved for ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. Rooms would confirm final availability and any pre-order with you.`;
+      confirmText.textContent = `Your reservation details are saved on this device for ${room}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. Live submission will be connected to Rooms' booking channel in the production build.`;
     }
 
     const cp = document.getElementById('confirmPreorder');
@@ -361,41 +360,9 @@ const body = document.body;
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
   }
 
-  /* ---------- Login modal ---------- */
-  const loginOverlay = document.getElementById('loginOverlay');
-  const loginBtn = document.getElementById('loginBtn');
-  const loginClose = document.getElementById('loginClose');
-  const loginTitle = document.getElementById('loginTitle');
-  const loginSub = document.getElementById('loginSub');
-  const nameFieldWrap = document.getElementById('nameFieldWrap');
-  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-  const switchToSignup = document.getElementById('switchToSignup');
-  let isSignup = false;
-
-  function openLogin(){ loginOverlay.classList.add('open'); }
-  function closeLogin(){ loginOverlay.classList.remove('open'); }
-  loginBtn.addEventListener('click', openLogin);
-  loginClose.addEventListener('click', closeLogin);
-  loginOverlay.addEventListener('click', (e) => { if(e.target === loginOverlay) closeLogin(); });
-
-  switchToSignup.addEventListener('click', () => {
-    isSignup = !isSignup;
-    if(isSignup){
-      loginTitle.textContent = 'Create Account';
-      loginSub.textContent = 'Join 915 Dupont for faster reservations.';
-      nameFieldWrap.style.display = 'block';
-      loginSubmitBtn.textContent = 'Create Account';
-      switchToSignup.parentElement.innerHTML = 'Already have an account? <a id="switchToSignup2">Log in</a>';
-      document.getElementById('switchToSignup2').addEventListener('click', () => location.reload());
-    }
-  });
-
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    loginBtn.textContent = isSignup ? 'Account Created ✓' : 'Logged In ✓';
-    closeLogin();
-    showToast(isSignup ? 'Account created — welcome to 915 Dupont' : 'Welcome back');
-  });
+  /* ---------- Account ---------- */
+  // Real customer accounts require Rooms' own authentication/Shopify integration.
+  // The concept intentionally avoids pretending a local form is a real account system.
   /* ---------- PWA: register the service worker ---------- */
   // "if the browser supports service workers" — older browsers don't, so we check first
   if ('serviceWorker' in navigator) {
@@ -548,7 +515,7 @@ const body = document.body;
     const confirm = document.getElementById('confirmBox');
     if (room && confirm) {
       const p = confirm.querySelector('p');
-      if (p) p.textContent = `Your request is saved for ${room.title}. Rooms would confirm the final table, availability and any pre-order with you.`;
+      if (p) p.textContent = `Your reservation details are saved on this device for ${room.title}. Live submission will be connected to Rooms' booking channel in the production build.`;
     }
   });
 
