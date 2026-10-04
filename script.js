@@ -559,7 +559,7 @@ const body = document.body;
   });
 })();
 
-/* ---------- Shared image viewer: menu, shop, coffee, cocktails, locations + editorial media ---------- */
+/* ---------- Shared image viewer: focused media preview + swipe navigation ---------- */
 (() => {
   const viewer = document.getElementById('mediaViewer');
   if (!viewer) return;
@@ -569,6 +569,7 @@ const body = document.body;
   const titleEl = document.getElementById('mediaViewerTitle');
   const descEl = document.getElementById('mediaViewerDescription');
   const metaEl = document.getElementById('mediaViewerMeta');
+  const linkEl = document.getElementById('mediaViewerLink');
   const counterEl = document.getElementById('mediaViewerCounter');
   const prevBtn = viewer.querySelector('.media-viewer-prev');
   const nextBtn = viewer.querySelector('.media-viewer-next');
@@ -577,19 +578,19 @@ const body = document.body;
   let index = 0;
   let touchStartX = 0;
   let touchStartY = 0;
+  let lastFocused = null;
 
   const clean = value => (value || '').replace(/\s+/g,' ').trim();
 
   function getDetails(img) {
-    const card = img.closest('.menu-card,.shop-card,.bean-card,.cocktail-card,.drink-card,.location-card,.rooms-mood-card,.rooms-editorial-portrait,.rooms-editorial-card,.clock-photo,.matcha-beer,.rooms-sound-image,.coffee-photos,.ig-strip,.hero,.hero-bg,.location-visual');
-    if (!card) return { kicker:'ROOMS COFFEE', title:img.alt || 'Rooms Coffee', desc:'', meta:'' };
+    const card = img.closest('.menu-card,.shop-card,.cocktail-card,.drink-card,.rooms-mood-card,.rooms-editorial-portrait,.rooms-editorial-card,.clock-photo,.matcha-beer,.rooms-sound-image,.coffee-photos,.ig-strip,.hero,.hero-bg,.rooms-location-preview,.location-visual');
+    if (!card) return { kicker:'ROOMS COFFEE', title:img.alt || 'Rooms Coffee', desc:'', meta:'', url:'' };
 
     const title = clean(
-      card.querySelector('h3,h4,.rooms-mood-card h3,.location-copy h3,.rooms-editorial-copy h3')?.textContent ||
+      card.querySelector('h3,h4')?.textContent ||
       img.alt ||
       'Rooms Coffee'
     );
-
     const price = clean(card.querySelector('.price,.mp,.price-tag')?.textContent);
     const origin = clean(card.querySelector('.origin,.meta')?.textContent);
     const description = clean(card.querySelector('p')?.textContent);
@@ -598,27 +599,46 @@ const body = document.body;
     let kicker = 'ROOMS COFFEE';
     if (card.classList.contains('shop-card')) kicker = 'TAKE HOME / GIFT SHOP';
     else if (card.classList.contains('menu-card') || card.classList.contains('drink-card')) kicker = 'MENU / 915 DUPONT';
-    else if (card.classList.contains('bean-card')) kicker = 'COFFEE / SINGLE ORIGIN';
     else if (card.classList.contains('cocktail-card')) kicker = 'FROM THE BAR';
-    else if (card.classList.contains('location-card')) kicker = clean(card.querySelector('.location-number')?.textContent);
     else if (card.classList.contains('rooms-mood-card')) kicker = 'THE ROOMS';
     else if (card.classList.contains('clock-photo')) kicker = '915 DUPONT / DAY & NIGHT';
     else if (card.classList.contains('ig-strip')) kicker = 'ROOMS / GALLERY';
     else if (card.classList.contains('coffee-photos') || card.classList.contains('matcha-beer')) kicker = 'COFFEE & MATCHA';
+    else if (card.classList.contains('rooms-editorial-portrait') || card.classList.contains('rooms-editorial-card')) kicker = 'ROOMS / BALDWIN';
+
+    let url = '';
+    if (card.classList.contains('shop-card')) {
+      const name = clean(card.querySelector('h4')?.textContent);
+      const catalog = window.ROOMS_PRODUCT_CATALOG || {};
+      url = catalog[name]?.url || '';
+    }
 
     return {
       kicker,
       title,
       desc: description,
-      meta: [origin, price, locationMeta].filter(Boolean).join(' · ')
+      meta: [origin, price, locationMeta].filter(Boolean).join(' · '),
+      url
     };
   }
 
   function getGroup(img) {
+    if (img.closest('.shop-card')) {
+      return [...document.querySelectorAll('.shop-grid .shop-card img:not(.no-preview)')];
+    }
+    if (img.closest('.menu-card')) {
+      const grid = img.closest('.menu-grid');
+      return grid ? [...grid.querySelectorAll('.menu-card img:not(.no-preview)')] : [img];
+    }
+    if (img.closest('.rooms-editorial-portrait,.rooms-editorial-card,.rooms-sound-image')) {
+      const section = img.closest('.rooms-editorial');
+      return section ? [...section.querySelectorAll('.rooms-editorial-portrait img,.rooms-editorial-card img,.rooms-sound-image img')] : [img];
+    }
     const section = img.closest('section');
     if (!section) return [img];
-    const candidates = [...section.querySelectorAll('img:not(.no-preview)')];
-    return candidates.length ? candidates : [img];
+    return [...section.querySelectorAll('img:not(.no-preview)')].filter(candidate =>
+      !candidate.closest('.bean-card,.location-card,.coffee-modal,.location-media-modal')
+    );
   }
 
   function render() {
@@ -631,6 +651,14 @@ const body = document.body;
     titleEl.textContent = details.title;
     descEl.textContent = details.desc;
     metaEl.textContent = details.meta;
+    metaEl.hidden = !details.meta;
+    if (details.url) {
+      linkEl.href = details.url;
+      linkEl.hidden = false;
+    } else {
+      linkEl.hidden = true;
+      linkEl.removeAttribute('href');
+    }
     counterEl.textContent = String(index + 1).padStart(2,'0') + ' / ' + String(items.length).padStart(2,'0');
     prevBtn.hidden = items.length < 2;
     nextBtn.hidden = items.length < 2;
@@ -639,16 +667,19 @@ const body = document.body;
   function open(img) {
     items = getGroup(img);
     index = Math.max(0, items.indexOf(img));
+    lastFocused = document.activeElement;
     render();
     viewer.classList.add('open');
     viewer.setAttribute('aria-hidden','false');
     document.body.classList.add('media-viewer-open');
+    viewer.querySelector('.media-viewer-close')?.focus();
   }
 
   function close() {
     viewer.classList.remove('open');
     viewer.setAttribute('aria-hidden','true');
     document.body.classList.remove('media-viewer-open');
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
   }
 
   function step(direction) {
@@ -657,7 +688,11 @@ const body = document.body;
     render();
   }
 
+  // Keep the existing coffee/location modals authoritative. The shared viewer
+  // handles standalone media and the menu/shop/editorial experiences.
   document.querySelectorAll('img:not(.no-preview)').forEach(img => {
+    const interactiveParent = img.closest('a,button,[role="button"],.bean-card,.location-card');
+    if (interactiveParent) return;
     img.tabIndex = 0;
     img.setAttribute('role','button');
     img.setAttribute('aria-label', 'Preview ' + (img.alt || 'image'));
@@ -672,8 +707,8 @@ const body = document.body;
   document.addEventListener('click', e => {
     if (viewer.classList.contains('open')) return;
     const img = e.target.closest('img:not(.no-preview)');
-    if (!img || img.closest('.media-viewer') || img.closest('.location-media-modal')) return;
-    e.preventDefault();
+    if (!img || img.closest('.media-viewer,.location-media-modal,.coffee-modal')) return;
+    if (img.closest('a,button,[role="button"],.bean-card,.location-card')) return;
     open(img);
   });
 
@@ -701,5 +736,13 @@ const body = document.body;
     if (e.key === 'Escape') close();
     if (e.key === 'ArrowLeft') step(-1);
     if (e.key === 'ArrowRight') step(1);
+  });
+
+  // Native lazy-loading keeps the long image-heavy page lighter without
+  // delaying the opening hero imagery.
+  const images = [...document.querySelectorAll('img')];
+  images.forEach((img, i) => {
+    if (i > 3 && !img.loading) img.loading = 'lazy';
+    img.decoding = 'async';
   });
 })();
