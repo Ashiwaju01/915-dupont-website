@@ -188,6 +188,7 @@ const body = document.body;
     "Cream Baseball Cap": { price:30, url:`${ROOMS_STORE}/products/rooms-baseball-cap` },
     "Navy Baseball Cap": { price:30, url:`${ROOMS_STORE}/products/rooms-blue-baseball-cap` },
     "Eyes Logo Mug": { price:25, url:`${ROOMS_STORE}/products/rooms-classic-ceramic-mug` },
+    "News Man Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-news-man-ceramic-to-go-cup` },
     "Running Man Glass Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-running-man-glass-cup` },
     "Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` },
     "Rooms Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` }
