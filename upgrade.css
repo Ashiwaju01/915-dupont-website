@@ -881,3 +881,22 @@ html.theme-switching .locations-section{
   html.theme-switching .locations-section{transition:none!important;}
   .toggle span{transition:none!important;}
 }
+
+
+/* ===== NIGHT THEME: THREE MOODS CONTRAST ===== */
+/* The three-moods section is intentionally light in Day mode, but must become
+   a true dark surface in Night mode so its heading never disappears into the
+   page background. */
+body.night .rooms-three-moods{
+  background:var(--night-bg) !important;
+  color:var(--ink-night) !important;
+  transition:background-color .7s ease,color .7s ease;
+}
+body.night .rooms-three-moods .section-head h2{
+  color:var(--ink-night) !important;
+  opacity:1 !important;
+}
+body.night .rooms-three-moods .section-head .tag{
+  color:var(--ink-night) !important;
+  opacity:.7 !important;
+}
