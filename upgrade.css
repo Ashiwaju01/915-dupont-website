@@ -714,6 +714,7 @@ body.night .field select.reservation-party option{
 
 /* ===== SHARED IMAGE VIEWER / SWIPE GALLERY ===== */
 img:not(.no-preview){cursor:zoom-in;}
+body.media-viewer-open{overflow:hidden;}
 .media-viewer{position:fixed;inset:0;z-index:1600;display:none;}
 .media-viewer.open{display:block;}
 .media-viewer-backdrop{position:absolute;inset:0;background:rgba(8,6,5,.84);backdrop-filter:blur(14px);}
@@ -731,6 +732,10 @@ body.night .media-viewer-panel{background:var(--night-bg);color:var(--ink-night)
 .media-viewer-info h3{font-size:clamp(28px,3.2vw,48px);line-height:1.02;margin-bottom:15px;}
 .media-viewer-info p{font-size:14px;line-height:1.75;opacity:.72;max-width:46ch;}
 .media-viewer-meta{margin-top:22px;padding-top:16px;border-top:1px solid var(--line-day);font:10px 'JetBrains Mono',monospace;line-height:1.6;opacity:.65;text-transform:uppercase;}
+.media-viewer-link{display:inline-flex;align-self:flex-start;margin-top:18px;padding:10px 0;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;font:10px 'JetBrains Mono',monospace;letter-spacing:.06em;opacity:.78;}
+.media-viewer-link:hover{opacity:1;}
+.shop-card .photo::after,.menu-card .photo::after{content:'↗';position:absolute;right:10px;bottom:10px;width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.65);border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font:12px 'JetBrains Mono',monospace;pointer-events:none;opacity:.85;}
+.shop-card .photo,.menu-card .photo{position:relative;overflow:hidden;}
 body.night .media-viewer-meta{border-color:var(--line-night);}
 .media-viewer-hint{margin-top:auto;padding-top:28px;font-size:8px;letter-spacing:.08em;opacity:.4;}
 .shop-card .photo,.menu-card .photo,.bean-card .swatch,.cocktail-card .ph,.drink-card .dc-photo,.coffee-photos .ph,.matcha-beer .ph,.clock-photo,.hero-bg,.ig-strip img,.location-visual,.rooms-editorial-portrait,.rooms-editorial-card,.rooms-sound-image,.rooms-mood-card{cursor:zoom-in;}
