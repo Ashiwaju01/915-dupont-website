@@ -757,3 +757,105 @@ body.night .media-viewer-meta{border-color:var(--line-night);}
   .media-viewer-info h3{font-size:27px;}
 }
 @media(prefers-reduced-motion:reduce){.media-viewer-arrow{transition:none;}}
+
+
+/* ===== POLISH PASS: THEME REVEAL + LOCATION CONTRAST ===== */
+.rooms-location-preview{
+  color:var(--ink-day);
+  background:var(--day-panel);
+  transition:background-color .7s ease,color .7s ease;
+}
+body.night .rooms-location-preview{
+  background:var(--night-panel);
+  color:var(--ink-night);
+}
+.rooms-preview-copy h2{
+  color:inherit;
+  opacity:1;
+  text-shadow:none;
+}
+.rooms-preview-copy p{
+  color:inherit;
+  opacity:.86;
+}
+.rooms-preview-copy .tag{
+  color:inherit;
+  opacity:.68;
+}
+.rooms-preview-meta{
+  color:inherit;
+  opacity:.66;
+}
+.rooms-preview-media img{
+  opacity:1;
+  transition:opacity .32s ease,transform .5s ease;
+}
+.rooms-preview-media img.room-image-switching{opacity:0;}
+.rooms-preview-media img.room-image-ready{opacity:1;}
+
+/* A clean, cinematic end to the 915 Dupont hero — no hazy/blurred wash below the headline. */
+.hero-bg::after{
+  background:linear-gradient(
+    180deg,
+    rgba(18,13,10,.28) 0%,
+    rgba(18,13,10,.50) 52%,
+    rgba(18,13,10,.82) 100%
+  ) !important;
+  transition:background .7s ease,opacity .7s ease;
+}
+body.night .hero-bg::after{
+  background:linear-gradient(
+    180deg,
+    rgba(18,13,10,.28) 0%,
+    rgba(18,13,10,.64) 52%,
+    rgba(18,13,10,.90) 100%
+  ) !important;
+}
+
+/* Manual day/night switching: use a single composed reveal instead of every element
+   jumping independently. The fallback still fades the key surfaces on older browsers. */
+html{
+  view-transition-name:root;
+}
+::view-transition-old(root){
+  animation:none;
+}
+::view-transition-new(root){
+  animation:rooms-theme-reveal .72s cubic-bezier(.22,.75,.18,1) both;
+}
+@keyframes rooms-theme-reveal{
+  from{clip-path:circle(0 at var(--theme-x,50%) var(--theme-y,50%));}
+  to{clip-path:circle(150vmax at var(--theme-x,50%) var(--theme-y,50%));}
+}
+html.theme-switching body,
+html.theme-switching nav,
+html.theme-switching section,
+html.theme-switching .rooms-location-preview,
+html.theme-switching .locations-section{
+  transition:background .72s ease,color .72s ease,border-color .72s ease;
+}
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-old(root),
+  ::view-transition-new(root){animation:none!important;}
+  html.theme-switching body,
+  html.theme-switching nav,
+  html.theme-switching section,
+  html.theme-switching .rooms-location-preview,
+  html.theme-switching .locations-section{transition:none!important;}
+}
+
+/* Make preview affordance unmistakable on touch and desktop. */
+.shop-card .photo::after,
+.menu-card .photo::after{
+  content:'↗';
+}
+.shop-card .photo,
+.menu-card .photo,
+.rooms-location-preview .rooms-preview-media{
+  cursor:zoom-in;
+}
+.shop-card .photo img,
+.menu-card .photo img,
+.rooms-location-preview .rooms-preview-media img{
+  -webkit-tap-highlight-color:transparent;
+}
