@@ -737,6 +737,13 @@ const body = document.body;
     if (e.key === 'Escape') close();
     if (e.key === 'ArrowLeft') step(-1);
     if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'Tab') {
+      const focusables = [...viewer.querySelectorAll('button:not([hidden]),a:not([hidden])')].filter(el => !el.hasAttribute('disabled'));
+      if (!focusables.length) return;
+      const first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
 
   // Native lazy-loading keeps the long image-heavy page lighter without
