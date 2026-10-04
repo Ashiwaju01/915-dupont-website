@@ -759,33 +759,47 @@ body.night .media-viewer-meta{border-color:var(--line-night);}
 @media(prefers-reduced-motion:reduce){.media-viewer-arrow{transition:none;}}
 
 
-/* ===== POLISH PASS: THEME REVEAL + LOCATION CONTRAST ===== */
+/* ===== FINAL POLISH: THEME, LOCATION CONTRAST + HERO ===== */
+
+/* Location preview must remain readable in both themes. */
 .rooms-location-preview{
-  color:var(--ink-day);
-  background:var(--day-panel);
+  color:var(--ink-day) !important;
+  background:var(--day-panel) !important;
   transition:background-color .7s ease,color .7s ease;
 }
 body.night .rooms-location-preview{
-  background:var(--night-panel);
-  color:var(--ink-night);
+  color:var(--ink-night) !important;
+  background:var(--night-panel) !important;
 }
-.rooms-preview-copy h2{
-  color:inherit;
-  opacity:1;
+body:not(.night) .rooms-location-preview .rooms-preview-copy h2{
+  color:var(--ink-day) !important;
+  opacity:1 !important;
   text-shadow:none;
 }
-.rooms-preview-copy p{
-  color:inherit;
-  opacity:.86;
+body:not(.night) .rooms-location-preview .rooms-preview-copy p{
+  color:var(--ink-day) !important;
+  opacity:.84 !important;
 }
-.rooms-preview-copy .tag{
-  color:inherit;
-  opacity:.68;
+body:not(.night) .rooms-location-preview .rooms-preview-copy .tag,
+body:not(.night) .rooms-location-preview .rooms-preview-meta{
+  color:var(--ink-day) !important;
+  opacity:.68 !important;
 }
-.rooms-preview-meta{
-  color:inherit;
-  opacity:.66;
+body.night .rooms-location-preview .rooms-preview-copy h2{
+  color:var(--ink-night) !important;
+  opacity:1 !important;
+  text-shadow:none;
 }
+body.night .rooms-location-preview .rooms-preview-copy p{
+  color:var(--ink-night) !important;
+  opacity:.84 !important;
+}
+body.night .rooms-location-preview .rooms-preview-copy .tag,
+body.night .rooms-location-preview .rooms-preview-meta{
+  color:var(--ink-night) !important;
+  opacity:.68 !important;
+}
+
 .rooms-preview-media img{
   opacity:1;
   transition:opacity .32s ease,transform .5s ease;
@@ -793,35 +807,25 @@ body.night .rooms-location-preview{
 .rooms-preview-media img.room-image-switching{opacity:0;}
 .rooms-preview-media img.room-image-ready{opacity:1;}
 
-/* A clean, cinematic end to the 915 Dupont hero — no hazy/blurred wash below the headline. */
+/* Remove the visible haze/blur-like gradient below "A ROOM WITH NO SIGN".
+   A uniform overlay keeps the photography crisp while retaining text contrast. */
 .hero-bg::after{
-  background:linear-gradient(
-    180deg,
-    rgba(18,13,10,.28) 0%,
-    rgba(18,13,10,.50) 52%,
-    rgba(18,13,10,.82) 100%
-  ) !important;
+  background:rgba(18,13,10,.46) !important;
   transition:background .7s ease,opacity .7s ease;
 }
 body.night .hero-bg::after{
-  background:linear-gradient(
-    180deg,
-    rgba(18,13,10,.28) 0%,
-    rgba(18,13,10,.64) 52%,
-    rgba(18,13,10,.90) 100%
-  ) !important;
+  background:rgba(18,13,10,.58) !important;
 }
 
-/* Manual day/night switching: use a single composed reveal instead of every element
-   jumping independently. The fallback still fades the key surfaces on older browsers. */
-html{
-  view-transition-name:root;
-}
+/* Dynamic manual day/night transition. The browser View Transition API
+   gets a circular reveal from the toggle; the JS fallback fades the same
+   surfaces when View Transitions are unavailable. */
 ::view-transition-old(root){
   animation:none;
 }
 ::view-transition-new(root){
-  animation:rooms-theme-reveal .72s cubic-bezier(.22,.75,.18,1) both;
+  animation:rooms-theme-reveal .78s cubic-bezier(.22,.75,.18,1) both;
+  transform-origin:var(--theme-x,50%) var(--theme-y,50%);
 }
 @keyframes rooms-theme-reveal{
   from{clip-path:circle(0 at var(--theme-x,50%) var(--theme-y,50%));}
@@ -832,16 +836,23 @@ html.theme-switching nav,
 html.theme-switching section,
 html.theme-switching .rooms-location-preview,
 html.theme-switching .locations-section{
-  transition:background .72s ease,color .72s ease,border-color .72s ease;
+  transition:background .78s ease,color .78s ease,border-color .78s ease;
 }
-@media(prefers-reduced-motion:reduce){
-  ::view-transition-old(root),
-  ::view-transition-new(root){animation:none!important;}
-  html.theme-switching body,
-  html.theme-switching nav,
-  html.theme-switching section,
-  html.theme-switching .rooms-location-preview,
-  html.theme-switching .locations-section{transition:none!important;}
+
+/* Make the selected Day/Night state itself feel intentional. */
+.toggle{
+  position:relative;
+  isolation:isolate;
+}
+.toggle span{
+  position:relative;
+  z-index:1;
+  transition:background .32s cubic-bezier(.22,.75,.18,1),color .32s ease,transform .32s ease;
+}
+.toggle span.active{
+  background:var(--hanko);
+  color:#fff;
+  transform:scale(1.02);
 }
 
 /* Make preview affordance unmistakable on touch and desktop. */
@@ -858,4 +869,15 @@ html.theme-switching .locations-section{
 .menu-card .photo img,
 .rooms-location-preview .rooms-preview-media img{
   -webkit-tap-highlight-color:transparent;
+}
+
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-old(root),
+  ::view-transition-new(root){animation:none!important;}
+  html.theme-switching body,
+  html.theme-switching nav,
+  html.theme-switching section,
+  html.theme-switching .rooms-location-preview,
+  html.theme-switching .locations-section{transition:none!important;}
+  .toggle span{transition:none!important;}
 }
