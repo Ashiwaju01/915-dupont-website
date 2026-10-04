@@ -63,15 +63,10 @@ const body = document.body;
     });
   }
 
-  const heroSection = document.querySelector('.hero');
-  const coffeeSection = document.getElementById('coffee');
-  if (coffeeSection) {
-    new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) setMode(true, false); }); }, { rootMargin: '-45% 0px -45% 0px' }).observe(coffeeSection);
-  }
-  if (heroSection) {
-    new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) setMode(false, false); }); }, { rootMargin: '-45% 0px -45% 0px' }).observe(heroSection);
-  }
-
+  // Theme is user-controlled only. Do not change it while scrolling.
+  // This prevents a manual Night selection from snapping back to Day around the
+  // 915 Dupont hero and keeps the toggle state consistent with the page.
+  
   document.querySelectorAll('.clock-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('.clock-chip').forEach(c => c.classList.remove('active'));
@@ -757,10 +752,12 @@ const body = document.body;
   // handles standalone media and the menu/shop/editorial experiences.
   // Bind preview directly to each standalone image. This avoids delegated-click
   // conflicts with the shop, menu, location and modal controls.
-  document.querySelectorAll('img:not(.no-preview)').forEach(img => {
-    const interactiveParent = img.closest('a,button,[role="button"],.bean-card,.location-card,.location-media-modal,.coffee-modal');
+  function bindPreviewImage(img) {
+    if (!img || img.classList.contains('no-preview') || img.dataset.previewBound === 'true') return;
+    const interactiveParent = img.closest('a,button,[role="button"],.bean-card,.location-card,.location-media-modal,.coffee-modal,.media-viewer');
     if (interactiveParent) return;
 
+    img.dataset.previewBound = 'true';
     img.tabIndex = 0;
     img.setAttribute('role','button');
     img.setAttribute('aria-label', 'Preview ' + (img.alt || 'image'));
@@ -773,6 +770,20 @@ const body = document.body;
 
     img.addEventListener('click', preview);
     img.addEventListener('keydown', preview);
+  }
+
+  document.querySelectorAll('img:not(.no-preview)').forEach(bindPreviewImage);
+
+  // Delegated fallback: this also makes previews work for images added later,
+  // and guarantees a tap on the image itself opens the viewer on touch devices.
+  document.addEventListener('click', e => {
+    if (viewer.classList.contains('open')) return;
+    const img = e.target.closest?.('img:not(.no-preview)');
+    if (!img || img.dataset.previewBound === 'true') return;
+    bindPreviewImage(img);
+    if (!img.closest('a,button,[role="button"],.bean-card,.location-card,.location-media-modal,.coffee-modal,.media-viewer')) {
+      open(img);
+    }
   });
 
   viewer.addEventListener('click', e => {
