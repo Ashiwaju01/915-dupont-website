@@ -1,16 +1,76 @@
 const body = document.body;
   const toggle = document.getElementById('dayNightToggle');
-  const setMode = (night) => {
+
+  const applyMode = (night) => {
     body.classList.toggle('night', night);
-    toggle.querySelectorAll('span').forEach(s => s.classList.remove('active'));
-    toggle.querySelector(`[data-mode="${night ? 'night' : 'day'}"]`).classList.add('active');
+    if (toggle) {
+      toggle.querySelectorAll('span').forEach(s => s.classList.remove('active'));
+      toggle.querySelector(`[data-mode="${night ? 'night' : 'day'}"]`)?.classList.add('active');
+      toggle.setAttribute('aria-pressed', String(night));
+      toggle.setAttribute('aria-label', night ? 'Switch to day mode' : 'Switch to night mode');
+    }
   };
-  toggle.addEventListener('click', () => setMode(!body.classList.contains('night')));
+
+  // Manual theme changes get a deliberate reveal from the toggle itself.
+  // Scroll-driven day/night changes stay quiet so scrolling never feels animated by force.
+  const setMode = (night, animate = false) => {
+    if (night === body.classList.contains('night')) {
+      if (toggle) {
+        toggle.setAttribute('aria-pressed', String(night));
+        toggle.setAttribute('aria-label', night ? 'Switch to day mode' : 'Switch to night mode');
+      }
+      return;
+    }
+
+    const update = () => applyMode(night);
+    if (!animate) {
+      update();
+      return;
+    }
+
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      update();
+      return;
+    }
+
+    const rect = toggle?.getBoundingClientRect();
+    if (rect) {
+      document.documentElement.style.setProperty('--theme-x', `${rect.left + rect.width / 2}px`);
+      document.documentElement.style.setProperty('--theme-y', `${rect.top + rect.height / 2}px`);
+    }
+
+    if (typeof document.startViewTransition === 'function') {
+      document.startViewTransition(update);
+    } else {
+      document.documentElement.classList.add('theme-switching');
+      update();
+      window.setTimeout(() => document.documentElement.classList.remove('theme-switching'), 720);
+    }
+  };
+
+  if (toggle) {
+    toggle.setAttribute('role', 'button');
+    toggle.setAttribute('tabindex', '0');
+    toggle.setAttribute('aria-pressed', String(body.classList.contains('night')));
+    toggle.setAttribute('aria-label', body.classList.contains('night') ? 'Switch to day mode' : 'Switch to night mode');
+    toggle.addEventListener('click', () => setMode(!body.classList.contains('night'), true));
+    toggle.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setMode(!body.classList.contains('night'), true);
+      }
+    });
+  }
 
   const heroSection = document.querySelector('.hero');
   const coffeeSection = document.getElementById('coffee');
-  new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) setMode(true); }); }, { rootMargin: '-45% 0px -45% 0px' }).observe(coffeeSection);
-  new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) setMode(false); }); }, { rootMargin: '-45% 0px -45% 0px' }).observe(heroSection);
+  if (coffeeSection) {
+    new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) setMode(true, false); }); }, { rootMargin: '-45% 0px -45% 0px' }).observe(coffeeSection);
+  }
+  if (heroSection) {
+    new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) setMode(false, false); }); }, { rootMargin: '-45% 0px -45% 0px' }).observe(heroSection);
+  }
 
   document.querySelectorAll('.clock-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -431,8 +491,14 @@ const body = document.body;
   function selectRoom(key) {
     const room = rooms[key];
     if (!room || !image) return;
+    image.classList.remove('room-image-ready');
+    image.classList.add('room-image-switching');
     image.src = room.images[0];
     image.alt = room.title;
+    image.onload = () => {
+      image.classList.remove('room-image-switching');
+      image.classList.add('room-image-ready');
+    };
     kicker.textContent = room.kicker;
     title.textContent = room.title;
     copy.textContent = room.text;
@@ -689,26 +755,24 @@ const body = document.body;
 
   // Keep the existing coffee/location modals authoritative. The shared viewer
   // handles standalone media and the menu/shop/editorial experiences.
+  // Bind preview directly to each standalone image. This avoids delegated-click
+  // conflicts with the shop, menu, location and modal controls.
   document.querySelectorAll('img:not(.no-preview)').forEach(img => {
-    const interactiveParent = img.closest('a,button,[role="button"],.bean-card,.location-card');
+    const interactiveParent = img.closest('a,button,[role="button"],.bean-card,.location-card,.location-media-modal,.coffee-modal');
     if (interactiveParent) return;
+
     img.tabIndex = 0;
     img.setAttribute('role','button');
     img.setAttribute('aria-label', 'Preview ' + (img.alt || 'image'));
-    img.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        open(img);
-      }
-    });
-  });
 
-  document.addEventListener('click', e => {
-    if (viewer.classList.contains('open')) return;
-    const img = e.target.closest('img:not(.no-preview)');
-    if (!img || img.closest('.media-viewer,.location-media-modal,.coffee-modal')) return;
-    if (img.closest('a,button,[role="button"],.bean-card,.location-card')) return;
-    open(img);
+    const preview = e => {
+      if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.type === 'keydown') e.preventDefault();
+      open(img);
+    };
+
+    img.addEventListener('click', preview);
+    img.addEventListener('keydown', preview);
   });
 
   viewer.addEventListener('click', e => {
