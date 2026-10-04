@@ -657,6 +657,18 @@ const body = document.body;
     render();
   }
 
+  document.querySelectorAll('img:not(.no-preview)').forEach(img => {
+    img.tabIndex = 0;
+    img.setAttribute('role','button');
+    img.setAttribute('aria-label', 'Preview ' + (img.alt || 'image'));
+    img.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open(img);
+      }
+    });
+  });
+
   document.addEventListener('click', e => {
     if (viewer.classList.contains('open')) return;
     const img = e.target.closest('img:not(.no-preview)');
