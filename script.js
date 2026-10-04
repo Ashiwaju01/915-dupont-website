@@ -159,7 +159,7 @@ const body = document.body;
       const party = partyEl?.value || '';
       const date = dateEl?.value || '';
       const time = timeEl?.value || '';
-      confirmText.textContent = `Your reservation details are saved on this device for ${room}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. Live submission will be connected to Rooms' booking channel in the production build.`;
+      confirmText.textContent = `Your reservation request is prepared for ${room}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. No request is sent from this concept; the live Rooms booking channel would be connected in production.`;
     }
 
     const cp = document.getElementById('confirmPreorder');
