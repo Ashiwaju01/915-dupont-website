@@ -677,6 +677,25 @@
     </div>
   </div>
 </div>
+<div class="media-viewer" id="mediaViewer" aria-hidden="true">
+  <div class="media-viewer-backdrop" data-media-close></div>
+  <div class="media-viewer-panel" role="dialog" aria-modal="true" aria-label="Image preview">
+    <button class="media-viewer-close" type="button" data-media-close aria-label="Close image preview">&times;</button>
+    <div class="media-viewer-stage">
+      <button class="media-viewer-arrow media-viewer-prev" type="button" aria-label="Previous image">‹</button>
+      <img id="mediaViewerImage" src="" alt="">
+      <button class="media-viewer-arrow media-viewer-next" type="button" aria-label="Next image">›</button>
+      <div class="media-viewer-counter mono" id="mediaViewerCounter"></div>
+    </div>
+    <div class="media-viewer-info">
+      <div class="media-viewer-kicker mono" id="mediaViewerKicker"></div>
+      <h3 class="display" id="mediaViewerTitle"></h3>
+      <p id="mediaViewerDescription"></p>
+      <div class="media-viewer-meta" id="mediaViewerMeta"></div>
+      <div class="media-viewer-hint mono">Swipe or use the arrows to explore</div>
+    </div>
+  </div>
+</div>
 <footer>
   <div class="wrap">
     <div>
