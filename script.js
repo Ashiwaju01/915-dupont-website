@@ -185,8 +185,6 @@ const body = document.body;
     "Indigo Denim Tote": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
     "Indigo Denim Tote Bag": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
     "Snake Mickey Tee": { price:40, url:`${ROOMS_STORE}/products/snake-micky-tee` },
-    "Cream Baseball Cap": { price:30, url:`${ROOMS_STORE}/products/rooms-baseball-cap` },
-    "Navy Baseball Cap": { price:30, url:`${ROOMS_STORE}/products/rooms-blue-baseball-cap` },
     "Eyes Logo Mug": { price:25, url:`${ROOMS_STORE}/products/rooms-classic-ceramic-mug` },
     "News Man Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-news-man-ceramic-to-go-cup` },
     "Running Man Glass Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-running-man-glass-cup` },
@@ -609,9 +607,9 @@ const body = document.body;
 
     let url = '';
     if (card.classList.contains('shop-card')) {
-      const name = clean(card.querySelector('h4')?.textContent);
+      const productName = clean(card.querySelector('.add-cart-btn')?.dataset.name || card.querySelector('h4')?.textContent);
       const catalog = window.ROOMS_PRODUCT_CATALOG || {};
-      url = catalog[name]?.url || '';
+      url = catalog[productName]?.url || '';
     }
 
     return {
