@@ -383,6 +383,7 @@ const body = document.body;
       title:'Rooms 135 Ossington',
       text:'Where the Rooms story began — an Asian-inspired neighbourhood café built around warm hospitality, thoughtful coffee and a sense of home.',
       meta:'135 OSSINGTON AVE · 8AM–6:30PM',
+      address:'135 Ossington Ave, Toronto, ON', hours:'8AM–6:30PM', experience:'Neighbourhood café · coffee · hospitality',
       instagram:'https://www.instagram.com/135ossington/',
       images:[
         'https://roomscoffee.online/cdn/shop/files/ECK_0068.00000000.jpg?v=1782836053&width=1800',
@@ -395,6 +396,7 @@ const body = document.body;
       title:'Rooms 17 Baldwin',
       text:'A hi-fi coffee room built around exceptional coffee, analog sound and thoughtful hospitality — a place for carefully brewed coffee and quiet connection.',
       meta:'17 BALDWIN ST · 8AM–6:30PM',
+      address:'17 Baldwin St, Toronto, ON', hours:'8AM–6:30PM', experience:'Hi-fi coffee room · vinyl · conversation',
       instagram:'https://www.instagram.com/17baldwinst/',
       images:[
         'https://roomscoffee.online/cdn/shop/files/ECK_2976.jpg?v=1784651907&width=1800',
@@ -408,6 +410,7 @@ const body = document.body;
       title:'Rooms 915 Dupont',
       text:'A hi-fi Japanese kissa-inspired café cocktail bar — coffee and daytime service give way to listening, drinks and late nights.',
       meta:'915 DUPONT ST · 8AM–2AM',
+      address:'915 Dupont St, Toronto, ON M6H 1Z1', hours:'8AM–2AM', experience:'Coffee · listening · cocktails',
       instagram:'https://www.instagram.com/915dupont/',
       images:[
         'https://roomscoffee.online/cdn/shop/files/ECK_8272.jpg?v=1777675337&width=1800',
@@ -440,6 +443,12 @@ const body = document.body;
     document.querySelectorAll('[data-location-card]').forEach(card => card.classList.toggle('active', card.dataset.locationCard === key));
     const reserve = document.getElementById('reservationLocation');
     if (reserve) reserve.value = key;
+    const reservationAddress = document.getElementById('reservationAddress');
+    const reservationHours = document.getElementById('reservationHours');
+    const reservationExperience = document.getElementById('reservationExperience');
+    if (reservationAddress) reservationAddress.textContent = room.address || room.meta;
+    if (reservationHours) reservationHours.textContent = room.hours || 'See Rooms for current hours';
+    if (reservationExperience) reservationExperience.textContent = room.experience || 'Coffee · hospitality';
   }
 
   document.querySelectorAll('.master-room-card').forEach(btn => {
