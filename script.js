@@ -193,6 +193,7 @@ const body = document.body;
     "Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` },
     "Rooms Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` }
   };
+  window.ROOMS_PRODUCT_CATALOG = PRODUCT_CATALOG;
 
   const cartCountEl = document.getElementById('cartCount');
   const cartItemsEl = document.getElementById('cartItems');
