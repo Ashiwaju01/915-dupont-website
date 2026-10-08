@@ -158,12 +158,13 @@ const body = document.body;
     });
   });
 
-  /* ---------- FIX: date input year capped at 4 digits, sensible range ---------- */
+  /* ---------- Reservation date bounds ---------- */
   const resDate = document.getElementById('resDate');
   if(resDate){
     const today = new Date();
+    const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
     const y = today.getFullYear();
-    resDate.min = `${y}-01-01`;
+    resDate.min = localToday;
     resDate.max = `${y+3}-12-31`;
     resDate.addEventListener('input', function(){
       const parts = this.value.split('-');
@@ -171,6 +172,8 @@ const body = document.body;
         parts[0] = parts[0].slice(0,4);
         this.value = parts.join('-');
       }
+      if(this.value && this.value < this.min) this.value = this.min;
+      if(this.value && this.value > this.max) this.value = this.max;
     });
   }
 
@@ -197,7 +200,7 @@ const body = document.body;
     });
   });
 
-  document.getElementById('bookingForm').addEventListener('submit', (e) => {
+  document.getElementById('bookingForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const dateEl = document.getElementById('resDate');
     const timeEl = document.getElementById('reservationTime');
@@ -422,7 +425,7 @@ const body = document.body;
   // "if the browser supports service workers" — older browsers don't, so we check first
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=24')
+      navigator.serviceWorker.register('sw.js?v=25')
         .then(() => console.log('Service worker registered — offline support active'))
         .catch((err) => console.log('Service worker registration failed:', err));
     });
