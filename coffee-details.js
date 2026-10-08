@@ -18,7 +18,7 @@
         ]
       },
       "Halo Beriti": {
-        storeUrl:"https://roomscoffee.online/products/halo-beriti",
+        storeUrl:"https://roomscoffee.online/products/guji-uraga-g1",
         country:"Ethiopia", weight:"250g", price:28, region:"Halo Beriti", altitude:"1900–2000 masl",
         variety:"Heirloom", process:"Washed", harvest:"Spring 2025",
         notes:"Osmanthus, white peach, citrus tea, clean finish.",
@@ -44,7 +44,7 @@
         ]
       },
       "Minas Gerais": {
-        storeUrl:"https://roomscoffee.online/products/minas-gerais",
+        storeUrl:"https://roomscoffee.online/products/minas-gerais-1",
         country:"Brazil", weight:"250g", price:26, region:"MINAS GERAIS", altitude:"1200 masl",
         variety:"Red Catuaí", process:"Natural", harvest:"Summer 2025",
         notes:"Toffee, cocoa, roasted nuts, gentle sweetness.",
