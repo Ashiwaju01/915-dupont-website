@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=25">
-<link rel="stylesheet" href="upgrade.css?v=32">
+<link rel="stylesheet" href="upgrade.css?v=33">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#C23B2B">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -584,29 +584,29 @@
       <form class="booking" id="bookingForm">
         <div id="formFields">
           <div class="field-row">
-            <div class="field"><label class="mono">Rooms location</label>
-              <select id="reservationLocation" required>
+            <div class="field"><label class="mono" for="reservationLocation">Rooms location</label>
+              <select id="reservationLocation" name="location" required>
                 <option value="">Choose a location</option>
                 <option value="ossington">135 Ossington</option>
                 <option value="baldwin">17 Baldwin</option>
                 <option value="dupont">915 Dupont</option>
               </select>
             </div>
-            <div class="field"><label class="mono">Name</label><input type="text" required placeholder="Your name"></div>
+            <div class="field"><label class="mono" for="reservationName">Name</label><input id="reservationName" name="name" type="text" autocomplete="name" required placeholder="Your name"></div>
           </div>
           <div class="field-row">
-            <div class="field"><label class="mono">Phone or email</label><input type="text" required placeholder="For your confirmation"></div>
-            <div class="field"><label class="mono">Date</label><input type="date" id="resDate" class="reservation-date" required></div>
+            <div class="field"><label class="mono" for="reservationContact">Phone or email</label><input id="reservationContact" name="contact" type="text" autocomplete="email" required placeholder="For your confirmation"></div>
+            <div class="field"><label class="mono" for="resDate">Date</label><input type="date" id="resDate" name="date" class="reservation-date" required></div>
           </div>
           <div class="field-row">
-            <div class="field"><label class="mono">Party size</label>
-              <select id="reservationPartySize" class="reservation-party" required><option value="">Select</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6+">6+</option></select>
+            <div class="field"><label class="mono" for="reservationPartySize">Party size</label>
+              <select id="reservationPartySize" name="partySize" class="reservation-party" required><option value="">Select</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6+">6+</option></select>
             </div>
-            <div class="field"><label class="mono">Preferred time</label><input type="time" id="reservationTime" class="reservation-time" required></div>
+            <div class="field"><label class="mono" for="reservationTime">Preferred time</label><input type="time" id="reservationTime" name="time" class="reservation-time" required></div>
           </div>
 
           <label class="mono" style="font-size:11px; opacity:.6; display:block; margin-bottom:10px;">Visit type</label>
-          <div class="chip-group" id="serviceChips">
+          <div class="chip-group" id="serviceChips" role="group" aria-label="Visit type">
             <div class="chip" data-value="Coffee">Coffee / daytime</div>
             <div class="chip" data-value="Meal">Meal / table</div>
             <div class="chip" data-value="Lounge">Listening / evening</div>
@@ -633,6 +633,8 @@
           <h3 class="display">Request prepared.</h3>
           <p>Rooms would confirm the final table, availability and any pre-order with you.</p>
           <div id="confirmPreorder" class="confirm-preorder"></div>
+          <div id="confirmActions" class="confirm-actions"></div>
+          <button type="button" id="editReservationRequest" class="confirm-edit-btn">Edit request</button>
         </div>
       </form>
     </div>
@@ -703,7 +705,7 @@
   <div class="bottom">© 2026 Rooms Coffee · Toronto, Canada. All rights reserved.</div>
 </footer>
 
-<script src="script.js?v=29"></script>
+<script src="script.js?v=30"></script>
 
 <script src="coffee-details.js?v=27"></script>
 </body>
