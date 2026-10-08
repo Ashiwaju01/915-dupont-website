@@ -967,3 +967,59 @@ body.night .rooms-three-moods .section-head .tag{
     display:block;
   }
 }
+
+
+/* ===== BALDWIN INTRO: KEEP THE TITLE VISIBLE + CLEAR OF PHOTOGRAPHY ===== */
+@media(min-width:901px){
+  .rooms-baldwin .rooms-editorial-intro{
+    position:relative;
+    z-index:10;
+    opacity:1 !important;
+    visibility:visible !important;
+    transform:none !important;
+    margin-bottom:56px !important;
+    overflow:visible !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-intro > div:first-child{
+    position:relative;
+    z-index:2;
+    min-width:0;
+  }
+
+  .rooms-baldwin .rooms-editorial-intro h2{
+    position:relative;
+    z-index:2;
+    display:block;
+    max-width:9ch;
+    color:#f3eee4;
+    overflow:visible !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-intro-copy{
+    position:relative;
+    z-index:2;
+    max-width:440px;
+  }
+
+  .rooms-baldwin .rooms-baldwin-hero{
+    position:relative;
+    z-index:1;
+  }
+}
+
+@media(max-width:900px){
+  .rooms-baldwin .rooms-editorial-intro{
+    position:relative;
+    z-index:5;
+    opacity:1 !important;
+    visibility:visible !important;
+    transform:none !important;
+    margin-bottom:42px !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-intro h2{
+    max-width:12ch;
+    overflow:visible !important;
+  }
+}
