@@ -202,32 +202,86 @@ const body = document.body;
 
   document.getElementById('bookingForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
+    const form = document.getElementById('bookingForm');
     const dateEl = document.getElementById('resDate');
     const timeEl = document.getElementById('reservationTime');
     const partyEl = document.getElementById('reservationPartySize');
     const confirmBox = document.getElementById('confirmBox');
     const confirmText = confirmBox?.querySelector('p');
     const locationEl = document.getElementById('reservationLocation');
+    const nameEl = document.getElementById('reservationName');
+    const contactEl = document.getElementById('reservationContact');
+    const actionsEl = document.getElementById('confirmActions');
+    const roomName = locationEl?.selectedOptions?.[0]?.textContent?.trim() || 'Rooms';
+    const locationKey = locationEl?.value || '';
+    const party = partyEl?.value || '';
+    const date = dateEl?.value || '';
+    const time = timeEl?.value || '';
+    const guestName = nameEl?.value?.trim() || '';
+    const guestContact = contactEl?.value?.trim() || '';
+    const visitType = document.querySelector('#serviceChips .chip.selected')?.dataset.value || 'Not specified';
+    const preorderTotal = preorderItems.reduce((sum, item) => sum + item.price, 0);
+    const preorderLines = preorderItems.length
+      ? preorderItems.map(item => `- ${item.name}: $${item.price} CAD`).join('\\n') + `\\nPre-order estimate: $${preorderTotal} CAD`
+      : 'No pre-order items selected.';
+    const subject = `Reservation request — ${roomName} — ${date}`;
+    const body = [
+      'Hello Rooms Coffee,',
+      '',
+      'I would like to request a reservation. Please confirm availability.',
+      '',
+      `Location: ${roomName}`,
+      `Name: ${guestName}`,
+      `Contact: ${guestContact}`,
+      `Date: ${date}`,
+      `Preferred time: ${time}`,
+      `Party size: ${party}`,
+      `Visit type: ${visitType}`,
+      '',
+      'Pre-order request:',
+      preorderLines,
+      '',
+      'I understand this is a request and is not confirmed until Rooms replies.',
+      'Thank you.'
+    ].join('\\n');
 
-    document.getElementById('formFields').style.display = 'none';
+    const knownEmails = {
+      ossington: '135ossington@gmail.com',
+      dupont: '915dupontcafe@gmail.com'
+    };
+    const recipient = knownEmails[locationKey];
+    if (actionsEl) {
+      if (recipient) {
+        const mailto = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        actionsEl.innerHTML = `<a class="btn btn-primary confirm-email-btn" href="${mailto}">Open email request ↗</a><p class="confirm-action-note">Your email app will open with the details filled in. The request is not sent until you send the email, and Rooms must confirm availability.</p>`;
+      } else {
+        actionsEl.innerHTML = '<a class="btn btn-primary confirm-email-btn" href="https://roomscoffee.online/pages/locations" target="_blank" rel="noopener">Find official Rooms contact ↗</a><p class="confirm-action-note">We do not have a verified direct email for 17 Baldwin in this concept, so we have not guessed one. Use Rooms’ official site to reach the right team.</p>';
+      }
+    }
+
+    const formFields = document.getElementById('formFields');
+    if (formFields) formFields.style.display = 'none';
     confirmBox?.classList.add('show');
 
     if (confirmText) {
-      const roomName = locationEl?.selectedOptions?.[0]?.textContent || 'Rooms';
-      const party = partyEl?.value || '';
-      const date = dateEl?.value || '';
-      const time = timeEl?.value || '';
-      confirmText.textContent = `Your reservation request is prepared for ${roomName}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. Live submission is not connected in this concept; the production build would connect Rooms' booking channel.`;
+      confirmText.textContent = `Your request details are ready for ${roomName}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. This is not a confirmed reservation; send the request and wait for Rooms to confirm availability.`;
     }
 
     const cp = document.getElementById('confirmPreorder');
-    if(preorderItems.length){
-      let html = '<div class="mono" style="font-size:11px; opacity:.6; margin-bottom:8px;">Pre-order</div>';
-      preorderItems.forEach(i => { html += `<div class="cp-row"><span>${i.name}</span><span>${i.price}</span></div>`; });
-      cp.innerHTML = html;
+    if (preorderItems.length && cp) {
+      cp.innerHTML = '<div class="mono" style="font-size:11px; opacity:.6; margin-bottom:8px;">Pre-order estimate</div>' +
+        preorderItems.map(item => `<div class="cp-row"><span>${item.name}</span><span>$${item.price} CAD</span></div>`).join('') +
+        `<div class="cp-row"><strong>Estimated total</strong><strong>$${preorderTotal} CAD</strong></div>`;
     } else if (cp) {
       cp.innerHTML = '';
     }
+  });
+
+  document.getElementById('editReservationRequest')?.addEventListener('click', () => {
+    document.getElementById('confirmBox')?.classList.remove('show');
+    const formFields = document.getElementById('formFields');
+    if (formFields) formFields.style.display = '';
+    document.getElementById('bookingForm')?.scrollIntoView({behavior:'smooth', block:'center'});
   });
 
   /* ---------- Cart ---------- */
