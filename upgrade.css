@@ -1000,3 +1000,8 @@ nav .rooms-brand-link{display:flex;align-items:center;flex-shrink:0;text-decorat
 nav .rooms-header-logo{display:block;width:132px;max-width:100%;height:auto;max-height:42px;object-fit:contain;transition:filter .5s ease,opacity .5s ease}
 body.night nav .rooms-header-logo{filter:brightness(0) invert(1)}
 @media(max-width:600px){nav .rooms-header-logo{width:108px;max-height:36px}}
+
+
+/* Official logo in the closing footer brand block */
+footer .rooms-footer-logo{display:block;width:92px;max-width:100%;height:auto;margin:12px 0 14px;filter:brightness(0) invert(1);opacity:.9}
+@media(max-width:600px){footer .rooms-footer-logo{width:84px;margin:10px 0 12px}}
