@@ -995,7 +995,8 @@ body.night .rooms-three-moods .section-head .tag{
   }
 }
 
-/* Official Rooms Coffee mark beside the footer contact emails */
-footer .rooms-official-logo{display:block;width:148px;max-width:100%;height:auto;margin:0 0 22px;filter:brightness(0) invert(1);opacity:.96}
-footer .footer-contact h5{margin-top:0}
-@media(max-width:600px){footer .rooms-official-logo{width:132px;margin-bottom:18px}}
+/* Official Rooms Coffee identity in the primary navigation */
+nav .rooms-brand-link{display:flex;align-items:center;flex-shrink:0;text-decoration:none;line-height:0}
+nav .rooms-header-logo{display:block;width:132px;max-width:100%;height:auto;max-height:42px;object-fit:contain;transition:filter .5s ease,opacity .5s ease}
+body.night nav .rooms-header-logo{filter:brightness(0) invert(1)}
+@media(max-width:600px){nav .rooms-header-logo{width:108px;max-height:36px}}
