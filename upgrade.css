@@ -900,3 +900,46 @@ body.night .rooms-three-moods .section-head .tag{
   color:var(--ink-night) !important;
   opacity:.7 !important;
 }
+
+
+/* ===== DESKTOP RHYTHM PASS: BALDWIN IMAGE COMPOSITION ===== */
+/* Keep the Baldwin photography on a deliberate visual baseline. The original
+   layout made the main portrait tall while the HI-FI image was noticeably
+   shorter, so the three photographic beats felt unrelated on desktop. */
+@media(min-width:901px){
+  .rooms-baldwin-hero{
+    grid-template-columns:minmax(0,1.55fr) minmax(0,.85fr);
+    align-items:stretch;
+  }
+  .rooms-editorial-portrait-main,
+  .rooms-baldwin-side .rooms-editorial-portrait-small{
+    height:620px;
+    min-height:620px;
+  }
+  .rooms-baldwin-side{
+    height:620px;
+    min-height:620px;
+  }
+  .rooms-baldwin-side .rooms-editorial-note{
+    min-height:0;
+    flex:1;
+  }
+
+  /* Give the full-width VINYL · HI-FI · COFFEE image the same visual weight
+     instead of letting it become an oversized, disconnected block. */
+  .rooms-sound-image{
+    height:620px;
+    max-height:620px;
+  }
+  .rooms-sound-image img{
+    height:620px;
+    min-height:620px;
+  }
+
+  /* The lower Baldwin detail images should also share a consistent vertical
+     rhythm rather than ending at different heights. */
+  .rooms-card-tall,
+  .rooms-card-detail{
+    height:520px;
+  }
+}
