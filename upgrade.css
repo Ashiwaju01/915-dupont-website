@@ -994,3 +994,8 @@ body.night .rooms-three-moods .section-head .tag{
     font-size:15px;
   }
 }
+
+/* Official Rooms Coffee mark beside the footer contact emails */
+footer .rooms-official-logo{display:block;width:148px;max-width:100%;height:auto;margin:0 0 22px;filter:brightness(0) invert(1);opacity:.96}
+footer .footer-contact h5{margin-top:0}
+@media(max-width:600px){footer .rooms-official-logo{width:132px;margin-bottom:18px}}
