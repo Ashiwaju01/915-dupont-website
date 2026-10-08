@@ -243,7 +243,7 @@ const body = document.body;
       '',
       'I understand this is a request and is not confirmed until Rooms replies.',
       'Thank you.'
-    ].join('\\n');
+    ].join('\n');
 
     const knownEmails = {
       ossington: '135ossington@gmail.com',
