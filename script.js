@@ -222,7 +222,7 @@ const body = document.body;
     const visitType = document.querySelector('#serviceChips .chip.selected')?.dataset.value || 'Not specified';
     const preorderTotal = preorderItems.reduce((sum, item) => sum + item.price, 0);
     const preorderLines = preorderItems.length
-      ? preorderItems.map(item => `- ${item.name}: $${item.price} CAD`).join('\\n') + `\\nPre-order estimate: $${preorderTotal} CAD`
+      ? preorderItems.map(item => `- ${item.name}: $${item.price} CAD`).join('\n') + `\nPre-order estimate: $${preorderTotal} CAD`
       : 'No pre-order items selected.';
     const subject = `Reservation request — ${roomName} — ${date}`;
     const body = [
