@@ -425,7 +425,7 @@ const body = document.body;
   // "if the browser supports service workers" — older browsers don't, so we check first
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=28')
+      navigator.serviceWorker.register('sw.js?v=29')
         .then(() => console.log('Service worker registered — offline support active'))
         .catch((err) => console.log('Service worker registration failed:', err));
     });
@@ -682,6 +682,10 @@ const body = document.body;
     if (img.closest('.menu-card')) {
       const grid = img.closest('.menu-grid');
       return grid ? [...grid.querySelectorAll('.menu-card img:not(.no-preview)')] : [img];
+    }
+    if (img.closest('.rooms-mood-card')) {
+      const section = img.closest('.rooms-three-moods');
+      return section ? [...section.querySelectorAll('.rooms-mood-card img:not(.no-preview)')] : [img];
     }
     if (img.closest('.rooms-editorial-portrait,.rooms-editorial-card,.rooms-sound-image')) {
       const section = img.closest('.rooms-editorial');
