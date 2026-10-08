@@ -213,11 +213,11 @@ const body = document.body;
     confirmBox?.classList.add('show');
 
     if (confirmText) {
-      const room = locationEl?.selectedOptions?.[0]?.textContent || 'Rooms';
+      const roomName = locationEl?.selectedOptions?.[0]?.textContent || 'Rooms';
       const party = partyEl?.value || '';
       const date = dateEl?.value || '';
       const time = timeEl?.value || '';
-      confirmText.textContent = `Your reservation request is prepared for ${room}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. No request is sent from this concept; the live Rooms booking channel would be connected in production.`;
+      confirmText.textContent = `Your reservation request is prepared for ${roomName}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. Live submission is not connected in this concept; the production build would connect Rooms' booking channel.`;
     }
 
     const cp = document.getElementById('confirmPreorder');
@@ -580,17 +580,7 @@ const body = document.body;
     if (key && rooms[key]) selectRoom(key);
   });
 
-  // Make the existing reserve form clearly a request, not a fake confirmed booking.
-  const bookingForm = document.getElementById('bookingForm');
-  bookingForm?.addEventListener('submit', () => {
-    const select = document.getElementById('reservationLocation');
-    const room = rooms[select?.value];
-    const confirm = document.getElementById('confirmBox');
-    if (room && confirm) {
-      const p = confirm.querySelector('p');
-      if (p) p.textContent = `Your reservation details are saved on this device for ${room.title}. Live submission will be connected to Rooms' booking channel in the production build.`;
-    }
-  });
+  // Reservation submission is handled by the single listener above.
 
   selectRoom('ossington');
 })();
