@@ -289,9 +289,9 @@ const body = document.body;
   const PRODUCT_CATALOG = {
     "Finca La Playita": { price:32, url:`${ROOMS_STORE}/products/finca-la-playita` },
     "El Paraiso 92": { price:32, url:`${ROOMS_STORE}/products/el-paraiso-92` },
-    "Minas Gerais": { price:26, url:`${ROOMS_STORE}/products/minas-gerais` },
+    "Minas Gerais": { price:26, url:`${ROOMS_STORE}/products/minas-gerais-1` },
     "Eduar Gaviria": { price:32, url:`${ROOMS_STORE}/products/eduar-gaviria` },
-    "Halo Beriti": { price:28, url:`${ROOMS_STORE}/products/halo-beriti` },
+    "Halo Beriti": { price:28, url:`${ROOMS_STORE}/products/guji-uraga-g1` },
     "Blue Note Tee": { price:40, url:`${ROOMS_STORE}/products/rooms-blue-note-t-shirt` },
     "Rooms LISTEN Tee": { price:35, url:`${ROOMS_STORE}/products/rooms-coffee-listen-tee` },
     "Indigo Denim Tote": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
