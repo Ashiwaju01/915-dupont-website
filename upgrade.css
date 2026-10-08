@@ -1023,3 +1023,86 @@ body.night .rooms-three-moods .section-head .tag{
     overflow:visible !important;
   }
 }
+
+
+/* ===== THE CUP: RESTORE CENTER COPY BETWEEN THE TWO IMAGES ===== */
+@media(min-width:901px){
+  .rooms-baldwin .rooms-editorial-grid{
+    position:relative;
+    z-index:2;
+    grid-template-columns:minmax(0,1fr) minmax(360px,1.15fr) minmax(0,1fr);
+    align-items:center;
+    gap:28px;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy{
+    position:relative;
+    z-index:5;
+    width:100%;
+    max-width:none;
+    box-sizing:border-box;
+    padding:42px 34px;
+    background:#211e1a;
+    color:#f3eee4 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    transform:none !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy .tag{
+    color:rgba(243,238,228,.55) !important;
+    opacity:1 !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy h3{
+    display:block;
+    color:#f3eee4 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    margin:14px 0 20px;
+    max-width:9ch;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy p{
+    display:block;
+    color:rgba(243,238,228,.72) !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    max-width:38ch;
+    margin:0;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-mini-links{
+    position:relative;
+    z-index:6;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-card-tall,
+  .rooms-baldwin .rooms-editorial-grid .rooms-card-detail{
+    position:relative;
+    z-index:1;
+  }
+}
+
+@media(max-width:900px){
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy{
+    position:relative;
+    z-index:4;
+    opacity:1 !important;
+    visibility:visible !important;
+    transform:none !important;
+    padding:28px 20px;
+    background:#211e1a;
+    color:#f3eee4 !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy h3,
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy p{
+    color:#f3eee4 !important;
+    opacity:1 !important;
+  }
+
+  .rooms-baldwin .rooms-editorial-grid .rooms-editorial-copy p{
+    color:rgba(243,238,228,.72) !important;
+  }
+}
