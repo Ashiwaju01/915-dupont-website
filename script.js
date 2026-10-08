@@ -771,6 +771,18 @@ const body = document.body;
 
   document.querySelectorAll('img:not(.no-preview)').forEach(bindPreviewImage);
 
+  // Explicit fallback for the three location mood cards. Some browsers or
+  // overlays can prevent the image-level handler from receiving the tap.
+  document.querySelectorAll('.rooms-three-moods .rooms-mood-card').forEach(card => {
+    card.style.cursor = 'zoom-in';
+    card.querySelector('img:not(.no-preview)')?.style.setProperty('cursor', 'zoom-in');
+    card.addEventListener('click', e => {
+      if (e.target.closest('a,button')) return;
+      const img = card.querySelector('img:not(.no-preview)');
+      if (img && e.target !== img) open(img);
+    });
+  });
+
   // Delegated fallback: this also makes previews work for images added later,
   // and guarantees a tap on the image itself opens the viewer on touch devices.
   document.addEventListener('click', e => {
