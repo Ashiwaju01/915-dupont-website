@@ -2,7 +2,7 @@
 // separate from your page. Its main job here: cache key files so the site
 // still loads (in a basic form) even with no internet connection.
 
-const CACHE_NAME = 'rooms-master-cache-v33';
+const CACHE_NAME = 'rooms-master-cache-v34';
 
 // Files to save for offline use. Keep this list to the essentials —
 // caching every single photo would make installs slow.
