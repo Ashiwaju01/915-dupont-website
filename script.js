@@ -481,7 +481,7 @@ const body = document.body;
   // "if the browser supports service workers" — older browsers don't, so we check first
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=37')
+      navigator.serviceWorker.register('sw.js?v=38')
         .then(() => console.log('Service worker registered — offline support active'))
         .catch((err) => console.log('Service worker registration failed:', err));
     });
