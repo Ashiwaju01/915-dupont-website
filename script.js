@@ -807,6 +807,9 @@ const body = document.body;
   // conflicts with the shop, menu, location and modal controls.
   function bindPreviewImage(img) {
     if (!img || img.classList.contains('no-preview') || img.dataset.previewBound === 'true') return;
+    // The three location cards have their own full-card interaction below.
+    // Do not attach a second click handler directly to their images.
+    if (img.closest('.rooms-three-moods .rooms-mood-card')) return;
     const interactiveParent = img.closest('a,button,[role="button"],.bean-card,.location-card,.location-media-modal,.coffee-modal,.media-viewer');
     if (interactiveParent) return;
 
@@ -827,15 +830,27 @@ const body = document.body;
 
   document.querySelectorAll('img:not(.no-preview)').forEach(bindPreviewImage);
 
-  // Explicit fallback for the three location mood cards. Some browsers or
-  // overlays can prevent the image-level handler from receiving the tap.
+  // Treat each of the three location mood cards as one accessible preview target.
+  // This avoids competing image/card click handlers and works when the overlay
+  // text or the image itself receives the tap.
   document.querySelectorAll('.rooms-three-moods .rooms-mood-card').forEach(card => {
+    const img = card.querySelector('img:not(.no-preview)');
+    const heading = card.querySelector('h3')?.textContent?.trim() || img?.alt || 'Rooms location';
+    if (!img) return;
     card.style.cursor = 'zoom-in';
-    card.querySelector('img:not(.no-preview)')?.style.setProperty('cursor', 'zoom-in');
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', 'Preview photos for ' + heading);
+    img.style.cursor = 'zoom-in';
     card.addEventListener('click', e => {
       if (e.target.closest('a,button')) return;
-      const img = card.querySelector('img:not(.no-preview)');
-      if (img && e.target !== img) open(img);
+      open(img);
+    });
+    card.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.target !== card) return;
+      e.preventDefault();
+      open(img);
     });
   });
 
