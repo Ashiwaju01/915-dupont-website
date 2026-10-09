@@ -1028,3 +1028,8 @@ body.night .confirm-action-note{color:var(--ink-night)}
 .product-size-select{width:100%;min-height:38px;padding:8px 10px;border:1px solid var(--line-day);border-radius:0;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}
 body.night .product-size-select{border-color:var(--line-night)}
 .product-size-select option{background:#fff;color:#16110d}
+
+
+/* Keyboard focus for the full-card location image previews */
+.rooms-three-moods .rooms-mood-card:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+.rooms-three-moods .rooms-mood-card:focus-visible img{transform:scale(1.025)}
