@@ -453,7 +453,7 @@ const body = document.body;
       const firstUrl = urls[0];
       if(firstUrl){
         window.open(firstUrl, '_blank', 'noopener');
-        showToast('Your cart is saved. Open the other selected items from this cart.');
+        showToast('Multi-item checkout is not connected yet. Your cart is saved here; open each selected product using its Rooms link.');
       } else {
         showToast('Your selections are saved. Open the Rooms store to complete your order.');
       }
@@ -479,7 +479,7 @@ const body = document.body;
   // "if the browser supports service workers" — older browsers don't, so we check first
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=34')
+      navigator.serviceWorker.register('sw.js?v=35')
         .then(() => console.log('Service worker registered — offline support active'))
         .catch((err) => console.log('Service worker registration failed:', err));
     });
