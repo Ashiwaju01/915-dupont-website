@@ -1020,3 +1020,11 @@ body.night .confirm-action-note{color:var(--ink-night)}
 
 /* Honour the native hidden attribute in the media viewer; component display rules must not override it. */
 .media-viewer [hidden]{display:none!important}
+
+
+/* Product option controls for apparel variants */
+.product-size-field{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin:0 0 12px}
+.product-size-field label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.62}
+.product-size-select{width:100%;min-height:38px;padding:8px 10px;border:1px solid var(--line-day);border-radius:0;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:pointer}
+body.night .product-size-select{border-color:var(--line-night)}
+.product-size-select option{background:#fff;color:#16110d}
