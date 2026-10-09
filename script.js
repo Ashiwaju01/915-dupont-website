@@ -287,21 +287,21 @@ const body = document.body;
   /* ---------- Cart ---------- */
   const ROOMS_STORE = 'https://roomscoffee.online';
   const PRODUCT_CATALOG = {
-    "Finca La Playita": { price:32, url:`${ROOMS_STORE}/products/finca-la-playita` },
-    "El Paraiso 92": { price:32, url:`${ROOMS_STORE}/products/el-paraiso-92` },
-    "Minas Gerais": { price:26, url:`${ROOMS_STORE}/products/minas-gerais-1` },
-    "Eduar Gaviria": { price:32, url:`${ROOMS_STORE}/products/eduar-gaviria` },
-    "Halo Beriti": { price:28, url:`${ROOMS_STORE}/products/guji-uraga-g1` },
-    "Blue Note Tee": { price:40, url:`${ROOMS_STORE}/products/rooms-blue-note-t-shirt` },
-    "Rooms LISTEN Tee": { price:35, url:`${ROOMS_STORE}/products/rooms-coffee-listen-tee` },
-    "Indigo Denim Tote": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
-    "Indigo Denim Tote Bag": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag` },
-    "Snake Mickey Tee": { price:40, url:`${ROOMS_STORE}/products/snake-micky-tee` },
-    "Eyes Logo Mug": { price:25, url:`${ROOMS_STORE}/products/rooms-classic-ceramic-mug` },
-    "News Man Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-news-man-ceramic-to-go-cup` },
-    "Running Man Glass Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-running-man-glass-cup` },
-    "Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` },
-    "Rooms Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug` }
+    "Finca La Playita": { price:32, url:`${ROOMS_STORE}/products/finca-la-playita`, variantId:'48239584673984', variantLabel:'250g' },
+    "El Paraiso 92": { price:32, url:`${ROOMS_STORE}/products/el-paraiso-92`, variantId:'48239407071424', variantLabel:'250g' },
+    "Minas Gerais": { price:26, url:`${ROOMS_STORE}/products/minas-gerais-1`, variantId:'48239318270144', variantLabel:'250g' },
+    "Eduar Gaviria": { price:32, url:`${ROOMS_STORE}/products/eduar-gaviria`, variantId:'48239817294016', variantLabel:'250g' },
+    "Halo Beriti": { price:28, url:`${ROOMS_STORE}/products/guji-uraga-g1`, variantId:'48238504050880', variantLabel:'250g' },
+    "Blue Note Tee": { price:40, url:`${ROOMS_STORE}/products/rooms-blue-note-t-shirt`, variants:{S:'48185197658304',M:'48185197625536',L:'48185197592768',XL:'48185197560000'} },
+    "Rooms LISTEN Tee": { price:35, url:`${ROOMS_STORE}/products/rooms-coffee-listen-tee`, variants:{S:'48185189630144',M:'48185189662912',L:'48185189695680',XL:'48185189728448'} },
+    "Indigo Denim Tote": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag`, variantId:'48185211945152' },
+    "Indigo Denim Tote Bag": { price:40, url:`${ROOMS_STORE}/products/rooms-indigo-denim-tote-bag`, variantId:'48185211945152' },
+    "Snake Mickey Tee": { price:40, url:`${ROOMS_STORE}/products/snake-micky-tee`, variants:{S:'48497137582272',M:'48497137615040',L:'48497137647808',XL:'48497137680576'} },
+    "Eyes Logo Mug": { price:25, url:`${ROOMS_STORE}/products/rooms-classic-ceramic-mug`, variantId:'48238297612480', variantLabel:'10oz' },
+    "News Man Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-news-man-ceramic-to-go-cup`, variantId:'48238278541504', variantLabel:'5oz' },
+    "Running Man Glass Cup": { price:25, url:`${ROOMS_STORE}/products/rooms-running-man-glass-cup`, variantId:'48238279196864', variantLabel:'8oz' },
+    "Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug`, variantId:'48238277198016', variantLabel:'14oz' },
+    "Rooms Titanium Camping Mug": { price:45, url:`${ROOMS_STORE}/products/rooms-titanium-camping-mug`, variantId:'48238277198016', variantLabel:'14oz' }
   };
   window.ROOMS_PRODUCT_CATALOG = PRODUCT_CATALOG;
 
@@ -310,80 +310,92 @@ const body = document.body;
   const cartTotalEl = document.getElementById('cartTotal');
   const cartDrawer = document.getElementById('cartDrawer');
   const cartOverlay = document.getElementById('cartOverlay');
-  const CART_KEY = 'rooms-demo-cart-v2';
+  const CART_KEY = 'rooms-demo-cart-v3';
+  const LEGACY_CART_KEY = 'rooms-demo-cart-v2';
 
-  let cart = [];
-  try {
-    const saved = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-    if (Array.isArray(saved)) cart = saved.filter(i => i && i.name && Number.isFinite(Number(i.price)));
-  } catch (_) {}
+  function getProductMeta(name, price, variantLabel='') {
+    const catalog = PRODUCT_CATALOG[name];
+    const selectedVariant = variantLabel && catalog?.variants ? catalog.variants[variantLabel] : null;
+    return {
+      price: Number(catalog?.price ?? price ?? 0),
+      url: catalog?.url || null,
+      variantId: selectedVariant || catalog?.variantId || null,
+      variantLabel: variantLabel || catalog?.variantLabel || ''
+    };
+  }
 
   const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[ch]));
 
-  function saveCart(){
+  let cart = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_KEY) || 'null');
+    if (Array.isArray(saved)) {
+      cart = saved.filter(i => i && i.name && i.variantId && Number.isFinite(Number(i.price)))
+        .map(i => ({...i, price:Number(i.price), qty:Math.max(1,Number(i.qty)||1)}));
+    } else {
+      const legacy = JSON.parse(localStorage.getItem(LEGACY_CART_KEY) || '[]');
+      if (Array.isArray(legacy)) {
+        legacy.forEach(i => {
+          const meta = i && getProductMeta(i.name, i.price);
+          // Do not guess a size for old T-shirt entries. Migrate only products
+          // with a single known Shopify variant.
+          if (!meta?.variantId || PRODUCT_CATALOG[i.name]?.variants) return;
+          const existing = cart.find(item => item.variantId === meta.variantId);
+          if (existing) existing.qty += 1;
+          else cart.push({name:i.name,price:meta.price,url:meta.url,variantId:meta.variantId,variantLabel:meta.variantLabel,qty:1});
+        });
+        try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (_) {}
+      }
+    }
+  } catch (_) {}
+
+  function saveCart() {
     try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (_) {}
   }
 
-  function getProductMeta(name, price){
-    const catalog = PRODUCT_CATALOG[name];
-    return {
-      price: Number(catalog?.price ?? price ?? 0),
-      url: catalog?.url || null
-    };
-  }
-
-  function renderCart(){
-    const grouped = {};
-    cart.forEach(item => {
-      if(!grouped[item.name]) {
-        const meta = getProductMeta(item.name, item.price);
-        grouped[item.name] = {name:item.name,price:meta.price,url:meta.url,qty:0};
-      }
-      grouped[item.name].qty += 1;
-    });
-    const items = Object.values(grouped);
-    cartCountEl.textContent = cart.length;
-
-    if(!items.length){
+  function renderCart() {
+    cartCountEl.textContent = cart.reduce((sum,item) => sum + item.qty, 0);
+    if (!cart.length) {
       cartItemsEl.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
     } else {
-      cartItemsEl.innerHTML = items.map(item => {
-        const name = escapeHtml(item.name);
+      cartItemsEl.innerHTML = cart.map((item,index) => {
+        const displayName = item.variantLabel && item.variantLabel !== 'Default Title'
+          ? `${item.name} — ${item.variantLabel}`
+          : item.name;
+        const name = escapeHtml(displayName);
         const roomLink = item.url
           ? `<a class="ci-room-link mono" href="${item.url}" target="_blank" rel="noopener">View on Rooms ↗</a>`
           : '';
         return `
-        <div class="cart-item">
-          <div class="ci-name-wrap">
-            <span class="ci-name">${name}</span>
-            ${roomLink}
-          </div>
-          <span class="ci-controls">
-            <button class="ci-qty" data-action="minus" data-name="${name}" aria-label="Decrease ${name}">−</button>
-            <span class="ci-qty-value">${item.qty}</span>
-            <button class="ci-qty" data-action="plus" data-name="${name}" aria-label="Increase ${name}">+</button>
-            <span class="mono ci-line-total">${item.price * item.qty}</span>
-            <button class="ci-remove" data-name="${name}" aria-label="Remove ${name}">&times;</button>
-          </span>
-        </div>`;
+          <div class="cart-item">
+            <div class="ci-name-wrap">
+              <span class="ci-name">${name}</span>
+              ${roomLink}
+            </div>
+            <span class="ci-controls">
+              <button class="ci-qty" data-action="minus" data-index="${index}" aria-label="Decrease ${name}">−</button>
+              <span class="ci-qty-value">${item.qty}</span>
+              <button class="ci-qty" data-action="plus" data-index="${index}" aria-label="Increase ${name}">+</button>
+              <span class="mono ci-line-total">$${item.price * item.qty} CAD</span>
+              <button class="ci-remove" data-index="${index}" aria-label="Remove ${name}">&times;</button>
+            </span>
+          </div>`;
       }).join('');
     }
 
-    const total = cart.reduce((s,i) => s + Number(i.price || 0), 0);
-    cartTotalEl.textContent = `${total}`;
+    const total = cart.reduce((sum,item) => sum + Number(item.price || 0) * item.qty, 0);
+    cartTotalEl.textContent = `$${total} CAD`;
 
     cartItemsEl.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const name = btn.dataset.name;
-        const index = cart.findIndex(i => i.name === name);
-        if(btn.dataset.action === 'plus'){
-          const item = cart.find(i => i.name === name);
-          if(item) cart.push({...item});
-        } else if(index > -1) {
-          cart.splice(index,1);
-        }
+        const index = Number(btn.dataset.index);
+        const item = cart[index];
+        if (!item) return;
+        if (btn.dataset.action === 'plus') item.qty += 1;
+        else if (item.qty > 1) item.qty -= 1;
+        else cart.splice(index,1);
         saveCart();
         renderCart();
       });
@@ -391,27 +403,28 @@ const body = document.body;
 
     cartItemsEl.querySelectorAll('.ci-remove').forEach(btn => {
       btn.addEventListener('click', () => {
-        cart = cart.filter(i => i.name !== btn.dataset.name);
+        const index = Number(btn.dataset.index);
+        if (Number.isInteger(index) && cart[index]) cart.splice(index,1);
         saveCart();
         renderCart();
       });
     });
   }
 
-  window.addToCart = function(name, price){
-    const meta = getProductMeta(name, price);
-    const existing = cart.find(item => item.name === name);
-    if(existing) {
-      existing.price = meta.price;
-      existing.url = meta.url;
-      cart.push({...existing});
-    } else {
-      cart.push({name, price:meta.price, url:meta.url});
+  window.addToCart = function(name, price, variantLabel='') {
+    const meta = getProductMeta(name, price, variantLabel);
+    if (!meta.variantId) {
+      showToast('Choose a size before adding this T-shirt.');
+      return false;
     }
+    const existing = cart.find(item => item.variantId === meta.variantId);
+    if (existing) existing.qty += 1;
+    else cart.push({name,price:meta.price,url:meta.url,variantId:meta.variantId,variantLabel:meta.variantLabel,qty:1});
     saveCart();
     renderCart();
-    showToast(`${name} added to cart`);
+    showToast(`${name}${meta.variantLabel && !['Default Title'].includes(meta.variantLabel) ? ' — ' + meta.variantLabel : ''} added to cart`);
     openCart();
+    return true;
   };
 
   function openCart(){ cartDrawer.classList.add('open'); cartOverlay.classList.add('open'); }
@@ -422,41 +435,30 @@ const body = document.body;
 
   document.querySelectorAll('.add-cart-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      window.addToCart(btn.dataset.name, parseFloat(btn.dataset.price));
-      btn.textContent = 'Added ✓';
-      btn.classList.add('added');
-      setTimeout(() => { btn.textContent = 'Add to Cart'; btn.classList.remove('added'); }, 1200);
+      const sizeSelect = btn.closest('.shop-card')?.querySelector('.product-size-select');
+      const size = sizeSelect?.value || '';
+      if (sizeSelect && !size) {
+        showToast('Choose a size before adding this T-shirt.');
+        sizeSelect.focus();
+        return;
+      }
+      const added = window.addToCart(btn.dataset.name, parseFloat(btn.dataset.price), size);
+      if (added) {
+        btn.textContent = 'Added ✓';
+        btn.classList.add('added');
+        setTimeout(() => { btn.textContent = 'Add to Cart'; btn.classList.remove('added'); }, 1200);
+      }
     });
   });
 
   const checkoutBtn = document.getElementById('checkoutBtn');
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
-      if(!cart.length){ showToast('Your cart is empty'); return; }
-
-      const uniqueNames = [...new Set(cart.map(i => i.name))];
-      const urls = uniqueNames
-        .map(name => getProductMeta(name, 0).url)
-        .filter(Boolean);
-
-      if(uniqueNames.length === 1 && urls[0]){
-        window.location.href = urls[0];
-        return;
-      }
-
-      /*
-       * GitHub Pages cannot create a Shopify multi-line cart without the
-       * store's live variant IDs. Do not pretend a mixed cart was transferred.
-       * Instead, open the first selected product and keep this cart intact so
-       * the customer can open the remaining selected products from their links.
-       */
-      const firstUrl = urls[0];
-      if(firstUrl){
-        window.open(firstUrl, '_blank', 'noopener');
-        showToast('Multi-item checkout is not connected yet. Your cart is saved here; open each selected product using its Rooms link.');
-      } else {
-        showToast('Your selections are saved. Open the Rooms store to complete your order.');
-      }
+      if (!cart.length) { showToast('Your cart is empty'); return; }
+      const invalid = cart.find(item => !item.variantId || !Number.isInteger(item.qty) || item.qty < 1);
+      if (invalid) { showToast('One or more cart items need a valid product option.'); return; }
+      const cartLines = cart.map(item => `${item.variantId}:${item.qty}`).join(',');
+      window.location.href = `${ROOMS_STORE}/cart/${cartLines}?checkout`;
     });
   }
 
