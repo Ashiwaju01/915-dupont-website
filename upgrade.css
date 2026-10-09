@@ -1016,3 +1016,7 @@ body.night .confirm-action-note{color:var(--ink-night)}
 .confirm-edit-btn:hover{opacity:1}
 .confirm .confirm-preorder{margin-top:18px}
 @media(max-width:600px){.confirm-actions{width:100%;padding:0 6px}.confirm-email-btn{width:100%}.confirm-action-note{font-size:12px}}
+
+
+/* Honour the native hidden attribute in the media viewer; component display rules must not override it. */
+.media-viewer [hidden]{display:none!important}
