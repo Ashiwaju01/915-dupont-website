@@ -1,0 +1,44 @@
+name: Rooms backend checks
+
+on:
+  pull_request:
+    paths:
+      - "supabase/**"
+      - "admin/**"
+      - ".github/workflows/rooms-backend-checks.yml"
+  push:
+    branches: ["main", "feature/rooms-backend-foundation"]
+    paths:
+      - "supabase/**"
+      - "admin/**"
+      - ".github/workflows/rooms-backend-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  database-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase services
+        run: supabase start
+
+      - name: Lint database migrations
+        run: supabase db lint --local
+
+      - name: Run database tests
+        run: supabase test db
+
+      - name: Stop local Supabase services
+        if: always()
+        run: supabase stop --no-backup
