@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Rooms Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script defer src="admin.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="./">ROOMS<span>ADMIN</span></a>
+    <div class="side-label">WORKSPACE</div>
+    <nav id="navigation" aria-label="Admin navigation">
+      <button class="nav-item active" data-module="overview">Overview</button>
+      <button class="nav-item" data-module="reservations">Reservations</button>
+      <button class="nav-item" data-module="locations">Locations</button>
+      <button class="nav-item" data-module="menu_categories">Menu categories</button>
+      <button class="nav-item" data-module="menu_items">Menu items</button>
+      <button class="nav-item" data-module="products">Shop products</button>
+      <button class="nav-item" data-module="orders">Orders</button>
+      <button class="nav-item" data-module="catering_enquiries">Catering enquiries</button>
+      <button class="nav-item" data-module="site_content">Website content</button>
+      <button class="nav-item owner-only" data-module="profiles">Staff & access</button>
+      <button class="nav-item manager-only" data-module="audit_logs">Audit log</button>
+    </nav>
+    <div class="side-bottom"><span class="status-dot"></span> Rooms workspace <small>Client-owned backend</small></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button><div><span class="eyebrow">ROOMS COFFEE · 915 DUPONT</span><h1 id="pageTitle">Overview</h1></div><div class="user-area"><span id="userEmail">Not signed in</span><button id="signOut" class="button ghost hidden">Sign out</button></div></header>
+    <section id="loginPanel" class="login-wrap">
+      <div class="login-card"><div class="eyebrow">PRIVATE STAFF ACCESS</div><h2>Good to have you back.</h2><p>Sign in with an authorized Rooms staff account to manage bookings, products and website content.</p>
+      <form id="loginForm"><label for="email">Work email</label><input id="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required><button class="button primary" type="submit">Sign in securely</button><p id="loginMessage" class="message" role="status"></p></form>
+      <p class="fine-print">Access is restricted by database permissions. Public account registration is disabled.</p></div>
+    </section>
+    <section id="appPanel" class="content hidden">
+      <div id="notice" class="notice hidden" role="status"></div>
+      <div id="overviewPanel"><div class="welcome"><div><div class="eyebrow">OPERATIONS</div><h2>One room. Every detail in order.</h2><p>Use this workspace to manage the operational details behind the Rooms experience.</p></div><span class="welcome-mark">R.</span></div><div id="stats" class="stats-grid"></div><div class="panel"><div class="panel-head"><div><h3>Recent reservations</h3><p>Latest booking records</p></div><button class="button ghost" data-goto="reservations">View all</button></div><div id="recentReservations" class="table-wrap"></div></div></div>
+      <div id="modulePanel" class="hidden"><div class="panel"><div class="panel-head"><div><h2 id="moduleHeading">Manage records</h2><p id="moduleDescription">Records saved to the connected Rooms database.</p></div><button class="button primary" id="addRecord">+ Add record</button></div><div class="toolbar"><input id="searchRecords" type="search" placeholder="Search visible records…" aria-label="Search records"><button class="button ghost" id="refreshRecords">Refresh</button></div><div id="recordsTable" class="table-wrap"></div><p id="moduleMessage" class="message" role="status"></p></div></div>
+    </section>
+    <footer>Rooms Admin · Private operations workspace <span>Production access requires Rooms-owned configuration.</span></footer>
+  </main>
+</div>
+<div id="recordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><div class="modal-head"><h2 id="modalTitle">Add record</h2><button id="closeModal" class="close-button" aria-label="Close">×</button></div><form id="recordForm"><div id="recordFields" class="form-grid"></div><p id="formMessage" class="message" role="status"></p><div class="modal-actions"><button type="button" class="button ghost" id="cancelModal">Cancel</button><button type="submit" class="button primary" id="saveRecord">Save record</button></div></form></div></div>
+</body></html>
