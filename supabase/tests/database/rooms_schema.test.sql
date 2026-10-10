@@ -1,5 +1,5 @@
 begin;
-select plan(19);
+select plan(20);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -66,6 +66,17 @@ select ok(
       and cmd = 'ALL'
   ),
   'only owner/manager policy can mutate order items'
+);
+
+select ok(
+  (select count(*) = 8
+   from pg_trigger t
+   join pg_class c on c.oid = t.tgrelid
+   join pg_namespace n on n.oid = c.relnamespace
+   where n.nspname = 'public'
+     and not t.tgisinternal
+     and t.tgname like 'set_updated_at_%'),
+  'updated_at triggers exist on all mutable timestamped tables'
 );
 
 select * from finish();
