@@ -167,6 +167,50 @@ create table public.audit_logs (
   created_at timestamptz not null default now()
 );
 
+-- Keep modification timestamps accurate for records that expose updated_at.
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  new.updated_at = now();
+  return new;
+end;
+$;
+
+drop trigger if exists set_updated_at_profiles on public.profiles;
+create trigger set_updated_at_profiles before update on public.profiles
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_locations on public.locations;
+create trigger set_updated_at_locations before update on public.locations
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_menu_items on public.menu_items;
+create trigger set_updated_at_menu_items before update on public.menu_items
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_products on public.products;
+create trigger set_updated_at_products before update on public.products
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_reservations on public.reservations;
+create trigger set_updated_at_reservations before update on public.reservations
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_orders on public.orders;
+create trigger set_updated_at_orders before update on public.orders
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_catering_enquiries on public.catering_enquiries;
+create trigger set_updated_at_catering_enquiries before update on public.catering_enquiries
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at_site_content on public.site_content;
+create trigger set_updated_at_site_content before update on public.site_content
+for each row execute function public.set_updated_at();
+
 -- SECURITY DEFINER helper avoids recursive RLS when checking staff permissions.
 create or replace function public.has_staff_role(allowed_roles public.staff_role[])
 returns boolean
