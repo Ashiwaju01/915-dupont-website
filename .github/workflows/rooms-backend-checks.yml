@@ -30,6 +30,12 @@ jobs:
         with:
           version: latest
 
+      - name: Check admin JavaScript syntax
+        run: node --check admin/admin.js
+
+      - name: Check patch whitespace
+        run: git diff --check
+
       - name: Start local Supabase services
         run: supabase start
 
