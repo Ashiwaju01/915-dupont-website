@@ -235,14 +235,16 @@ with check (public.has_staff_role(array['owner','manager','staff']::public.staff
 
 create policy "customer read own orders" on public.orders for select to authenticated
 using (customer_id = (select auth.uid()) or public.has_staff_role(array['owner','manager','staff']::public.staff_role[]));
-create policy "staff manage orders" on public.orders for all to authenticated
-using (public.has_staff_role(array['owner','manager','staff']::public.staff_role[]))
-with check (public.has_staff_role(array['owner','manager','staff']::public.staff_role[]));
+-- Financial/order mutations are restricted to owner/manager until trusted server-side
+-- payment and fulfillment workflows are implemented. Staff can still read orders above.
+create policy "managers manage orders" on public.orders for all to authenticated
+using (public.has_staff_role(array['owner','manager']::public.staff_role[]))
+with check (public.has_staff_role(array['owner','manager']::public.staff_role[]));
 create policy "customer read own order items" on public.order_items for select to authenticated
 using (exists (select 1 from public.orders o where o.id = order_id and (o.customer_id = (select auth.uid()) or public.has_staff_role(array['owner','manager','staff']::public.staff_role[]))));
-create policy "staff manage order items" on public.order_items for all to authenticated
-using (public.has_staff_role(array['owner','manager','staff']::public.staff_role[]))
-with check (public.has_staff_role(array['owner','manager','staff']::public.staff_role[]));
+create policy "managers manage order items" on public.order_items for all to authenticated
+using (public.has_staff_role(array['owner','manager']::public.staff_role[]))
+with check (public.has_staff_role(array['owner','manager']::public.staff_role[]));
 
 -- Public enquiry submissions are permitted; only staff may read or update enquiries.
 create policy "public submit catering enquiry" on public.catering_enquiries for insert to anon, authenticated with check (status = 'new' and internal_notes is null);
