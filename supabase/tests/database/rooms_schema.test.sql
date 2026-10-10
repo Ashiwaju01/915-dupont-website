@@ -1,5 +1,5 @@
 begin;
-select plan(17);
+select plan(19);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -45,6 +45,27 @@ select ok(
 select ok(
   has_table_privilege('anon', 'public.products', 'SELECT'),
   'anonymous visitors can read products subject to active-row RLS'
+);
+
+select ok(
+  exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'orders'
+      and policyname = 'managers manage orders'
+      and cmd = 'ALL'
+  ),
+  'only owner/manager policy can mutate orders'
+);
+select ok(
+  exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'order_items'
+      and policyname = 'managers manage order items'
+      and cmd = 'ALL'
+  ),
+  'only owner/manager policy can mutate order items'
 );
 
 select * from finish();
