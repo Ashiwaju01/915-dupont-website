@@ -1,5 +1,5 @@
 begin;
-select plan(12);
+select plan(17);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -24,6 +24,27 @@ select ok(
      ])
      and c.relrowsecurity),
   'RLS is enabled on every application table'
+);
+
+select ok(
+  not has_table_privilege('anon', 'public.reservations', 'INSERT'),
+  'anonymous visitors cannot insert reservations directly'
+);
+select ok(
+  not has_table_privilege('anon', 'public.orders', 'INSERT'),
+  'anonymous visitors cannot insert orders directly'
+);
+select ok(
+  has_table_privilege('anon', 'public.catering_enquiries', 'INSERT'),
+  'anonymous visitors can submit catering enquiries through the guarded table policy'
+);
+select ok(
+  not has_table_privilege('anon', 'public.audit_logs', 'SELECT'),
+  'anonymous visitors cannot read audit logs'
+);
+select ok(
+  has_table_privilege('anon', 'public.products', 'SELECT'),
+  'anonymous visitors can read products subject to active-row RLS'
 );
 
 select * from finish();
