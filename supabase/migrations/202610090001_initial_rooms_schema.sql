@@ -275,3 +275,30 @@ grant select, insert on public.audit_logs to authenticated;
 
 -- IMPORTANT: assign the first owner manually from the trusted Supabase SQL editor after
 -- creating that user's Auth account. Never expose service-role credentials in browser code.
+
+
+-- Create a least-privilege customer profile for each new Auth account.
+-- New accounts never receive a staff role from user-controlled metadata.
+create or replace function public.handle_new_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, full_name, role, active)
+  values (
+    new.id,
+    nullif(new.raw_user_meta_data ->> 'full_name', ''),
+    'customer'::public.staff_role,
+    true
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_rooms_profile on auth.users;
+create trigger on_auth_user_created_rooms_profile
+  after insert on auth.users
+  for each row execute procedure public.handle_new_auth_user();
