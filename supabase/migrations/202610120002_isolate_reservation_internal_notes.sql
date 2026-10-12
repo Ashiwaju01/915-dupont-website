@@ -33,7 +33,6 @@ alter table public.reservations drop column internal_notes;
 revoke all on function public.set_updated_at() from public, anon, authenticated;
 revoke all on function public.handle_new_auth_user() from public, anon, authenticated;
 
--- The role-check helper is intentionally called by RLS policies for authenticated users.
+-- RLS calls this helper for both public/anonymous reads and authenticated staff checks.
 revoke all on function public.has_staff_role(public.staff_role[]) from public;
-grant execute on function public.has_staff_role(public.staff_role[]) to authenticated;
-
+grant execute on function public.has_staff_role(public.staff_role[]) to anon, authenticated;
