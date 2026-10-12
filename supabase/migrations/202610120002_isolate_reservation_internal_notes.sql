@@ -27,6 +27,14 @@ with check (public.has_staff_role(array['owner','manager','staff']::public.staff
 revoke all on public.reservation_internal_notes from anon, authenticated;
 grant select, insert, update, delete on public.reservation_internal_notes to authenticated;
 
+-- Remove the insert policy that references internal_notes, then recreate it using
+-- only columns that remain on reservations. This avoids a dependency error when the
+-- sensitive column is removed below.
+drop policy if exists "customer create reservation" on public.reservations;
+create policy "customer create reservation"
+on public.reservations for insert to authenticated
+with check (customer_id = (select auth.uid()) and status = 'pending');
+
 alter table public.reservations drop column internal_notes;
 
 -- Trigger-only functions must not be directly executable by API roles.
