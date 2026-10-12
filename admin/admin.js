@@ -117,15 +117,13 @@
     const {error}=await query;
     $('#saveRecord').disabled=false;
     if(error){$('#formMessage').textContent='Not saved: '+error.message;return;}
-    await writeAudit(editingId?'update':'create',cfg.table,editingId||null);
     closeForm();notice('Record saved.');await loadRecords();
   }
   async function deleteRecord(id){
     const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly||!confirm('Delete this record? This may be blocked if other records depend on it.'))return;
     const {error}=await client.from(cfg.table).delete().eq('id',id);
     if(error){notice('Delete failed: '+error.message,true);return;}
-    await writeAudit('delete',cfg.table,id);notice('Record deleted.');await loadRecords();
+    notice('Record deleted.');await loadRecords();
   }
-  async function writeAudit(action,entity,id){try{await client.from('audit_logs').insert({actor_id:currentUser.id,action,entity_type:entity,entity_id:id?String(id):null,details:{source:'rooms-admin'}})}catch(_e){}}
   start().catch(e=>{$('#loginMessage').textContent='Could not initialize admin: '+e.message;});
 })();
