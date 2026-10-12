@@ -1,5 +1,5 @@
 begin;
-select plan(20);
+select plan(23);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -77,6 +77,27 @@ select ok(
      and not t.tgisinternal
      and t.tgname like 'set_updated_at_%'),
   'updated_at triggers exist on all mutable timestamped tables'
+);
+
+
+select ok(
+  not has_table_privilege('authenticated', 'public.audit_logs', 'INSERT'),
+  'signed-in clients cannot forge audit log rows'
+);
+select ok(
+  (select count(*) = 10
+   from pg_trigger t
+   join pg_class c on c.oid = t.tgrelid
+   join pg_namespace n on n.oid = c.relnamespace
+   where n.nspname = 'public'
+     and not t.tgisinternal
+     and t.tgname like 'audit_%'),
+  'database audit triggers cover all ten mutable business tables'
+);
+select ok(
+  not has_function_privilege('anon', 'public.audit_row_change()', 'EXECUTE')
+  and not has_function_privilege('authenticated', 'public.audit_row_change()', 'EXECUTE'),
+  'clients cannot call the audit trigger function directly'
 );
 
 select * from finish();
