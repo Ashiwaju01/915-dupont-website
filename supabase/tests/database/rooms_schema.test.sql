@@ -1,5 +1,5 @@
 begin;
-select plan(23);
+select plan(25);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -12,20 +12,30 @@ select has_table('public', 'order_items', 'order items table exists');
 select has_table('public', 'catering_enquiries', 'catering enquiries table exists');
 select has_table('public', 'site_content', 'site content table exists');
 select has_table('public', 'audit_logs', 'audit logs table exists');
+select has_table('public', 'reservation_internal_notes', 'staff-only reservation notes table exists');
 
 select ok(
-  (select count(*) = 11 from pg_class c
+  (select count(*) = 12 from pg_class c
    join pg_namespace n on n.oid = c.relnamespace
    where n.nspname = 'public'
      and c.relkind = 'r'
      and c.relname = any(array[
        'profiles','locations','menu_categories','menu_items','products',
-       'reservations','orders','order_items','catering_enquiries','site_content','audit_logs'
+       'reservations','orders','order_items','catering_enquiries','site_content',
+       'audit_logs','reservation_internal_notes'
      ])
      and c.relrowsecurity),
   'RLS is enabled on every application table'
 );
 
+select ok(
+  not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'reservations'
+      and column_name = 'internal_notes'
+  ),
+  'staff-only notes are not exposed on customer-readable reservations rows'
+);
 select ok(
   not has_table_privilege('anon', 'public.reservations', 'INSERT'),
   'anonymous visitors cannot insert reservations directly'
@@ -46,7 +56,6 @@ select ok(
   has_table_privilege('anon', 'public.products', 'SELECT'),
   'anonymous visitors can read products subject to active-row RLS'
 );
-
 select ok(
   exists (
     select 1 from pg_policies
@@ -67,7 +76,6 @@ select ok(
   ),
   'only owner/manager policy can mutate order items'
 );
-
 select ok(
   (select count(*) = 8
    from pg_trigger t
@@ -78,8 +86,6 @@ select ok(
      and t.tgname like 'set_updated_at_%'),
   'updated_at triggers exist on all mutable timestamped tables'
 );
-
-
 select ok(
   not has_table_privilege('authenticated', 'public.audit_logs', 'INSERT'),
   'signed-in clients cannot forge audit log rows'
@@ -98,6 +104,11 @@ select ok(
   not has_function_privilege('anon', 'public.audit_row_change()', 'EXECUTE')
   and not has_function_privilege('authenticated', 'public.audit_row_change()', 'EXECUTE'),
   'clients cannot call the audit trigger function directly'
+);
+select ok(
+  not has_function_privilege('anon', 'public.handle_new_auth_user()', 'EXECUTE')
+  and not has_function_privilege('authenticated', 'public.handle_new_auth_user()', 'EXECUTE'),
+  'clients cannot call the auth trigger function directly'
 );
 
 select * from finish();
