@@ -76,7 +76,8 @@
   }
   function tableHtml(rows,cols,actions){
     if(!rows.length)return '<div class="empty">No records yet.</div>';
-    return '<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c.replaceAll('_',' '))+'</th>').join('')+(actions?'<th>Actions</th>':'')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+cols.map(c=>'<td>'+(c==='status'||c==='role'||c==='payment_status'?'<span class="pill">'+escapeHtml(fmt(row[c]))+'</span>':escapeHtml(fmt(row[c])))+'</td>').join('')+(actions?'<td><button class="table-action" data-edit="'+escapeHtml(row.id)+'">Edit</button><button class="table-action delete" data-delete="'+escapeHtml(row.id)+'">Delete</button></td>':'')+'</tr>').join('')+'</tbody></table>';
+    const keyField=moduleConfig[activeModule]?.keyField||'id';
+    return '<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c.replaceAll('_',' '))+'</th>').join('')+(actions?'<th>Actions</th>':'')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+cols.map(c=>'<td>'+(c==='status'||c==='role'||c==='payment_status'?'<span class="pill">'+escapeHtml(fmt(row[c]))+'</span>':escapeHtml(fmt(row[c])))+'</td>').join('')+(actions?'<td><button class="table-action" data-edit="'+escapeHtml(row[keyField])+'">Edit</button><button class="table-action delete" data-delete="'+escapeHtml(row[keyField])+'">Delete</button></td>':'')+'</tr>').join('')+'</tbody></table>';
   }
   function renderRecords(){
     const cfg=moduleConfig[activeModule];if(!cfg)return;
