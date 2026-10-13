@@ -5,10 +5,10 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const moduleConfig = {
-    reservations:{title:'Reservations',desc:'Review bookings and update their status.',table:'reservations',fields:[['guest_name','Guest name','text',true],['guest_email','Email','email',true],['guest_phone','Phone','text'],['location_id','Location ID','text',true],['party_size','Party size','number',true],['starts_at','Start date and time','datetime-local',true],['ends_at','End date and time','datetime-local'],['status','Status','select',true,['pending','confirmed','cancelled','completed','no_show']],['customer_notes','Guest notes','textarea']],columns:['confirmation_code','guest_name','guest_email','party_size','starts_at','status','id']},
+    reservations:{title:'Reservations',desc:'Review bookings and update their status.',table:'reservations',fields:[['guest_name','Guest name','text',true],['guest_email','Email','email',true],['guest_phone','Phone','text'],['location_id','Location','select',true,'locations'],['party_size','Party size','number',true],['starts_at','Start date and time','datetime-local',true],['ends_at','End date and time','datetime-local'],['status','Status','select',true,['pending','confirmed','cancelled','completed','no_show']],['customer_notes','Guest notes','textarea']],columns:['confirmation_code','guest_name','guest_email','party_size','starts_at','status','id']},
     locations:{title:'Locations',desc:'Manage locations, addresses and opening hours.',table:'locations',fields:[['name','Name','text',true],['slug','URL slug','text',true],['address','Address','text',true],['description','Description','textarea'],['phone','Phone','text'],['email','Email','email'],['opening_hours','Opening hours (JSON)','textarea'],['is_active','Active','checkbox'],['sort_order','Sort order','number']],columns:['name','slug','address','is_active','sort_order','id']},
-    menu_categories:{title:'Menu categories',desc:'Organize menus by category and location.',table:'menu_categories',fields:[['name','Name','text',true],['slug','Slug','text',true],['location_id','Location ID (optional)','text'],['description','Description','textarea'],['sort_order','Sort order','number'],['is_active','Active','checkbox']],columns:['name','slug','location_id','is_active','sort_order','id']},
-    menu_items:{title:'Menu items',desc:'Manage menu copy, prices and availability. Prices are stored in cents.',table:'menu_items',fields:[['category_id','Category ID','text',true],['name','Name','text',true],['description','Description','textarea'],['price_cents','Price in cents (e.g. 650 = $6.50)','number',true],['currency','Currency (ISO code)','text',true],['image_url','Image URL','url'],['dietary_tags','Dietary tags (comma-separated)','text'],['is_available','Available','checkbox'],['sort_order','Sort order','number']],columns:['name','price_cents','currency','is_available','category_id','id']},
+    menu_categories:{title:'Menu categories',desc:'Organize menus by category and location.',table:'menu_categories',fields:[['name','Name','text',true],['slug','Slug','text',true],['location_id','Location (optional)','select',false,'locations'],['description','Description','textarea'],['sort_order','Sort order','number'],['is_active','Active','checkbox']],columns:['name','slug','location_id','is_active','sort_order','id']},
+    menu_items:{title:'Menu items',desc:'Manage menu copy, prices and availability. Prices are stored in cents.',table:'menu_items',fields:[['category_id','Menu category','select',true,'menu_categories'],['name','Name','text',true],['description','Description','textarea'],['price_cents','Price in cents (e.g. 650 = $6.50)','number',true],['currency','Currency (ISO code)','text',true],['image_url','Image URL','url'],['dietary_tags','Dietary tags (comma-separated)','text'],['is_available','Available','checkbox'],['sort_order','Sort order','number']],columns:['name','price_cents','currency','is_available','category_id','id']},
     products:{title:'Shop products',desc:'Manage product listings and inventory. Prices are stored in cents.',table:'products',fields:[['name','Product name','text',true],['slug','URL slug','text',true],['description','Description','textarea'],['price_cents','Price in cents','number',true],['currency','Currency (ISO code)','text',true],['image_url','Image URL','url'],['sku','SKU','text'],['inventory_quantity','Inventory quantity (blank = not tracked)','number'],['is_active','Active','checkbox']],columns:['name','sku','price_cents','inventory_quantity','is_active','id']},
     orders:{title:'Orders',desc:'Read-only order review. Payment state and totals stay locked until verified server-side payment webhooks and order controls are implemented.',table:'orders',readonly:true,fields:[],columns:['order_number','customer_name','customer_email','status','total_cents','payment_status','id']},
     catering_enquiries:{title:'Catering enquiries',desc:'Follow up on catering and event enquiries.',table:'catering_enquiries',fields:[['name','Name','text',true],['email','Email','email',true],['phone','Phone','text'],['event_date','Event date','date'],['guest_count','Guest count','number'],['event_type','Event type','text'],['message','Message','textarea',true],['status','Status','select',true,['new','in_review','responded','closed']],['internal_notes','Internal notes','textarea']],columns:['name','email','event_date','guest_count','status','id']},
@@ -85,13 +85,37 @@
     $('#recordsTable').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openForm(records.find(r=>String(r[cfg.keyField||'id'])===b.dataset.edit))));
     $('#recordsTable').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteRecord(b.dataset.delete)));
   }
-  function openForm(record=null){
-    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly)return;editingId=record?.[cfg.keyField||'id']||null;$('#modalTitle').textContent=editingId?'Edit '+cfg.title.toLowerCase():'Add '+cfg.title.toLowerCase();$('#formMessage').textContent='';
+  async function openForm(record=null){
+    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly)return;
+    const dynamicOptions={};
+    if(cfg.fields.some(f=>f[2]==='select'&&f[4]==='locations')){
+      const {data,error}=await client.from('locations').select('id,name').eq('is_active',true).order('sort_order');
+      if(error){$('#formMessage').textContent='Could not load locations: '+error.message;return;}
+      dynamicOptions.locations=(data||[]).map(x=>({value:x.id,label:x.name}));
+    }
+    if(cfg.fields.some(f=>f[2]==='select'&&f[4]==='menu_categories')){
+      const {data,error}=await client.from('menu_categories').select('id,name').eq('is_active',true).order('sort_order');
+      if(error){$('#formMessage').textContent='Could not load menu categories: '+error.message;return;}
+      dynamicOptions.menu_categories=(data||[]).map(x=>({value:x.id,label:x.name}));
+    }
+    editingId=record?.[cfg.keyField||'id']||null;
+    $('#modalTitle').textContent=editingId?'Edit '+cfg.title.toLowerCase():'Add '+cfg.title.toLowerCase();
+    $('#formMessage').textContent='';
     $('#recordFields').innerHTML=cfg.fields.map(([key,label,type,required,options])=>{
-      let val=record?.[key];if(type==='datetime-local'&&val)val=new Date(val).toISOString().slice(0,16);if(type==='checkbox')return '<div class="field"><label><input style="width:auto" type="checkbox" name="'+key+'" '+(val?'checked':'')+'> '+escapeHtml(label)+'</label></div>';
-      let input;if(type==='textarea')input='<textarea name="'+key+'" '+(required?'required':'')+'>'+escapeHtml(typeof val==='object'&&val!==null?JSON.stringify(val):val??'')+'</textarea>';
-      else if(type==='select')input='<select name="'+key+'" '+(required?'required':'')+'>'+options.map(o=>'<option value="'+o+'" '+(val===o?'selected':'')+'>'+o.replaceAll('_',' ')+'</option>').join('')+'</select>';
-      else input='<input name="'+key+'" type="'+(type==='number'?'number':type==='datetime-local'?'datetime-local':type)+'" value="'+escapeHtml(val??'')+'" '+(required?'required':'')+(type==='number'?' step="1"':'')+'>';
+      let val=record?.[key];
+      if(type==='datetime-local'&&val)val=new Date(val).toISOString().slice(0,16);
+      if(type==='checkbox')return '<div class="field"><label><input style="width:auto" type="checkbox" name="'+key+'" '+(val?'checked':'')+'> '+escapeHtml(label)+'</label></div>';
+      let input;
+      if(type==='textarea')input='<textarea name="'+key+'" '+(required?'required':'')+'>'+escapeHtml(typeof val==='object'&&val!==null?JSON.stringify(val):val??'')+'</textarea>';
+      else if(type==='select'){
+        const dynamic=typeof options==='string';
+        const optionList=dynamic?(dynamicOptions[options]||[]):(options||[]);
+        input='<select name="'+key+'" '+(required?'required':'')+'>'+(dynamic?'<option value="">Choose '+escapeHtml(label.toLowerCase())+'</option>':'')+optionList.map(o=>{
+          const optionValue=typeof o==='string'?o:o.value;
+          const optionLabel=typeof o==='string'?o.replaceAll('_',' '):o.label;
+          return '<option value="'+escapeHtml(optionValue)+'" '+(String(val??'')===String(optionValue)?'selected':'')+'>'+escapeHtml(optionLabel)+'</option>';
+        }).join('')+'</select>';
+      } else input='<input name="'+key+'" type="'+(type==='number'?'number':type==='datetime-local'?'datetime-local':type)+'" value="'+escapeHtml(val??'')+'" '+(required?'required':'')+(type==='number'?' step="1"':'')+'>';
       return '<div class="field '+(type==='textarea'?'full':'')+'"><label>'+escapeHtml(label)+'</label>'+input+'</div>';
     }).join('');
     $('#recordModal').classList.remove('hidden');
