@@ -1,5 +1,5 @@
 begin;
-select plan(26);
+select plan(29);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -109,6 +109,27 @@ select ok(
   not has_function_privilege('anon', 'public.handle_new_auth_user()', 'EXECUTE')
   and not has_function_privilege('authenticated', 'public.handle_new_auth_user()', 'EXECUTE'),
   'clients cannot call the auth trigger function directly'
+);
+
+select ok(
+  to_regprocedure('public.has_staff_role(public.staff_role[])') is null,
+  'staff-role helper is not exposed through the public API schema'
+);
+select ok(
+  to_regprocedure('private.has_staff_role(public.staff_role[])') is not null,
+  'staff-role helper exists in the private schema'
+);
+select ok(
+  not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and (
+        (coalesce(qual, '') like '%has_staff_role%' and coalesce(qual, '') not like '%private.has_staff_role%')
+        or
+        (coalesce(with_check, '') like '%has_staff_role%' and coalesce(with_check, '') not like '%private.has_staff_role%')
+      )
+  ),
+  'all staff authorization policies call the private helper'
 );
 
 select * from finish();
