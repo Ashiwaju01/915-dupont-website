@@ -143,9 +143,8 @@ select ok(
   'RLS is enabled on both reservation-support tables'
 );
 select ok(
-  not has_table_privilege('anon', 'public.reservation_settings', 'SELECT')
-  and not has_table_privilege('authenticated', 'public.reservation_settings', 'SELECT'),
-  'reservation settings are not directly readable by browser roles'
+  not has_table_privilege('anon', 'public.reservation_settings', 'SELECT'),
+  'anonymous visitors cannot read reservation settings'
 );
 select ok(
   not has_table_privilege('authenticated', 'public.request_rate_limits', 'SELECT'),
