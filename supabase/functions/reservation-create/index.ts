@@ -20,7 +20,7 @@ function respond(req: Request, status: number, body: Record<string, unknown>) {
     headers.set("access-control-allow-headers", "authorization, apikey, content-type, x-client-info");
     headers.set("access-control-max-age", "600");
   }
-  return new Response(JSON.stringify(body), { status, headers });
+  return new Response(status === 204 ? null : JSON.stringify(body), { status, headers });
 }
 
 async function sha256(value: string): Promise<string> {
@@ -55,7 +55,9 @@ Deno.serve(async (req: Request) => {
 
   let body: Record<string, unknown>;
   try {
-    const parsed = await req.json();
+    const rawBody = await req.text();
+    if (new TextEncoder().encode(rawBody).length > 16384) return respond(req, 413, { error: "Request is too large" });
+    const parsed = JSON.parse(rawBody);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Invalid body");
     body = parsed as Record<string, unknown>;
   } catch {
@@ -79,7 +81,7 @@ Deno.serve(async (req: Request) => {
     || !guestName || !guestEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)
     || (body.guestPhone != null && body.guestPhone !== "" && !guestPhone)
     || !Number.isInteger(partySize) || partySize < 1 || partySize > 20
-    || !startsAt || Number.isNaN(Date.parse(startsAt))
+    || !startsAt || !/(Z|[+-]\\d{2}:\\d{2})$/i.test(startsAt) || Number.isNaN(Date.parse(startsAt))
     || (body.customerNotes != null && body.customerNotes !== "" && customerNotes === null)) {
     return respond(req, 400, { error: "Check the name, email, party size and requested date/time." });
   }
