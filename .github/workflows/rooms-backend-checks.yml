@@ -47,7 +47,7 @@ jobs:
       - name: Check migration version uniqueness
         shell: bash
         run: |
-          duplicates="$(find supabase/migrations -maxdepth 1 -name '*.sql' -printf '%f\\n' | cut -d_ -f1 | sort | uniq -d)"
+          duplicates="$(find supabase/migrations -maxdepth 1 -name '*.sql' -printf '%f\n' | cut -d_ -f1 | sort | uniq -d)"
           if [ -n "$duplicates" ]; then
             echo "::error::Duplicate migration versions: $duplicates"
             exit 1
