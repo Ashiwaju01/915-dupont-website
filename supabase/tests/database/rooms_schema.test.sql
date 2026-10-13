@@ -169,5 +169,15 @@ select ok(
   'new location reservation settings are disabled until configured'
 );
 
+select ok(
+  not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'reservations'
+      and policyname = 'customer create reservation'
+  ),
+  'customer direct reservation insert policy is disabled until endpoint validation exists'
+);
+
 select * from finish();
 rollback;
