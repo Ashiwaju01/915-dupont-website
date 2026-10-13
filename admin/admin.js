@@ -74,7 +74,7 @@
     if(error){records=[];$('#recordsTable').innerHTML='<div class="empty">Could not load records: '+escapeHtml(error.message)+'</div>';return;}
     records=data||[];renderRecords();
   }
-  function tableHtml(rows,cols,actions){
+  function tableHtml(rows,cols,actions,keyField='id'){
     if(!rows.length)return '<div class="empty">No records yet.</div>';
     const keyField=moduleConfig[activeModule]?.keyField||'id';
     return '<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c.replaceAll('_',' '))+'</th>').join('')+(actions?'<th>Actions</th>':'')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+cols.map(c=>'<td>'+(c==='status'||c==='role'||c==='payment_status'?'<span class="pill">'+escapeHtml(fmt(row[c]))+'</span>':escapeHtml(fmt(row[c])))+'</td>').join('')+(actions?'<td><button class="table-action" data-edit="'+escapeHtml(row[keyField])+'">Edit</button><button class="table-action delete" data-delete="'+escapeHtml(row[keyField])+'">Delete</button></td>':'')+'</tr>').join('')+'</tbody></table>';
@@ -83,7 +83,7 @@
     const cfg=moduleConfig[activeModule];if(!cfg)return;
     const needle=$('#searchRecords').value.trim().toLowerCase();
     const filtered=records.filter(r=>!needle||Object.values(r).some(v=>String(v??'').toLowerCase().includes(needle)));
-    $('#recordsTable').innerHTML=tableHtml(filtered,cfg.columns,!cfg.readonly);
+    $('#recordsTable').innerHTML=tableHtml(filtered,cfg.columns,!cfg.readonly,cfg.keyField||'id');
     $('#recordsTable').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openForm(records.find(r=>String(r[cfg.keyField||'id'])===b.dataset.edit))));
     $('#recordsTable').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteRecord(b.dataset.delete)));
   }
