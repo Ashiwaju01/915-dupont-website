@@ -1,8 +1,17 @@
 begin;
-select plan(38);
+select plan(40);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
+select is(
+  (select count(*)::integer from public.locations),
+  3,
+  'the three Rooms locations are seeded for admin setup'
+);
+select ok(
+  not exists (select 1 from public.reservation_settings where enabled),
+  'seeded locations do not enable bookings without approved rules'
+);
 select has_table('public', 'menu_categories', 'menu categories table exists');
 select has_table('public', 'menu_items', 'menu items table exists');
 select has_table('public', 'products', 'products table exists');
