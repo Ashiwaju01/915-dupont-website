@@ -86,7 +86,7 @@
     $('#recordsTable').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteRecord(b.dataset.delete)));
   }
   function openForm(record=null){
-    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly)return;editingId=record?.id||null;$('#modalTitle').textContent=editingId?'Edit '+cfg.title.toLowerCase():'Add '+cfg.title.toLowerCase();$('#formMessage').textContent='';
+    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly)return;editingId=record?.[cfg.keyField||'id']||null;$('#modalTitle').textContent=editingId?'Edit '+cfg.title.toLowerCase():'Add '+cfg.title.toLowerCase();$('#formMessage').textContent='';
     $('#recordFields').innerHTML=cfg.fields.map(([key,label,type,required,options])=>{
       let val=record?.[key];if(type==='datetime-local'&&val)val=new Date(val).toISOString().slice(0,16);if(type==='checkbox')return '<div class="field"><label><input style="width:auto" type="checkbox" name="'+key+'" '+(val?'checked':'')+'> '+escapeHtml(label)+'</label></div>';
       let input;if(type==='textarea')input='<textarea name="'+key+'" '+(required?'required':'')+'>'+escapeHtml(typeof val==='object'&&val!==null?JSON.stringify(val):val??'')+'</textarea>';
