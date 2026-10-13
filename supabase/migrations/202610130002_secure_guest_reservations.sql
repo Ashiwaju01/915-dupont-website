@@ -199,7 +199,7 @@ begin
     nullif(btrim(coalesce(p_guest_phone, '')), ''), p_party_size,
     p_starts_at, v_end, 'pending', nullif(btrim(coalesce(p_customer_notes, '')), '')
   )
-  returning id, public.reservations.confirmation_code into v_id, v_code;
+  returning id, confirmation_code into v_id, v_code;
 
   return query select v_id, v_code, p_starts_at, v_end;
 end;
