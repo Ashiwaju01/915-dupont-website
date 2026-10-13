@@ -88,7 +88,7 @@ Deno.serve(async (req: Request) => {
 
   const clientIp = req.headers.get("cf-connecting-ip")
     ?? req.headers.get("x-real-ip")
-    ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    ?? req.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim()
     ?? "unknown";
   const client = createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
