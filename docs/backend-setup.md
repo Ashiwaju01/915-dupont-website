@@ -28,9 +28,9 @@ The migration in `supabase/migrations/202610090001_initial_rooms_schema.sql` cre
 5. Configure Storage buckets and policies; keep private operational documents private.
 6. Configure secrets only in Supabase project secrets / server environment. Never commit credentials or expose service-role keys in frontend JavaScript.
 7. Connect the current website via a public/publishable key only after RLS is tested.
-8. Implement and test server-side reservation availability, conflict prevention, rate limits, spam protection, order totals, inventory adjustments, signed payment webhooks, emails and audit events.
+8. Apply `202610130003_secure_guest_reservations.sql` only after reviewing it on a clean disposable database. Configure each location's `reservation_settings` (IANA timezone, opening hours JSON, capacity, duration, slot interval and booking window) before enabling reservations.\n9. Set the Edge Function secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `ALLOWED_ORIGINS` in Supabase; never place the service-role key in the browser. Deploy `reservation-create` only after origin, rate-limit, concurrency, and daylight-saving tests pass. Its public endpoint intentionally uses `verify_jwt = false` because guests are not signed in; its own controls must be configured first.\n10. Select the payment provider and email/SMS provider with Rooms before implementing order creation, signed/idempotent payment webhooks, inventory release/refunds, transactional notifications and audit events.
 9. Deploy admin behind authenticated routes and test owner/manager/staff permissions on desktop and mobile.
 10. Move from GitHub Pages only when a production host supporting the chosen server-side/runtime setup is configured. Keep the current live site unchanged until acceptance.
 
 ## Not yet live
-This commit does **not** provision a Supabase project, create accounts, process payments, send emails, or connect live booking forms. Those steps require Rooms-owned credentials, business decisions and explicit deployment approval.
+The reservation migration and Edge Function are committed to the feature branch but are not applied/deployed by this change. This commit does **not** process payments, send emails, or connect live booking forms. Those steps require Rooms-owned credentials, business decisions and explicit deployment approval.
