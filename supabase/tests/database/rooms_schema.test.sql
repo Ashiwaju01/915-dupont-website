@@ -77,7 +77,7 @@ select ok(
   'only owner/manager policy can mutate order items'
 );
 select ok(
-  (select count(*) = 8
+  (select count(*) = 9
    from pg_trigger t
    join pg_class c on c.oid = t.tgrelid
    join pg_namespace n on n.oid = c.relnamespace
@@ -91,14 +91,14 @@ select ok(
   'signed-in clients cannot forge audit log rows'
 );
 select ok(
-  (select count(*) = 10
+  (select count(*) = 11
    from pg_trigger t
    join pg_class c on c.oid = t.tgrelid
    join pg_namespace n on n.oid = c.relnamespace
    where n.nspname = 'public'
      and not t.tgisinternal
      and t.tgname like 'audit_%'),
-  'database audit triggers cover all ten mutable business tables'
+  'database audit triggers cover all eleven mutable business tables, including reservation settings'
 );
 select ok(
   not has_function_privilege('anon', 'public.audit_row_change()', 'EXECUTE')
