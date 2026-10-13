@@ -20,7 +20,7 @@ The initial migration and hardening migrations provide:
 - catering enquiries, editable website content and audit logs
 - staff-only reservation notes and protected audit triggers
 
-The feature branch also adds a configurable reservation-settings table, a server-only transactional guest-reservation RPC, a hashed-key rate-limit table/function, a guest reservation Edge Function, and manager-only reservation settings in the admin workspace. The reservation database migration has been applied to the connected development Supabase project and its migration history reconciled. The Edge Function and frontend integration remain undeployed.
+The feature branch also adds a configurable reservation-settings table, a server-only transactional guest-reservation RPC, a hashed-key rate-limit table/function, a guest reservation Edge Function, and manager-only reservation settings in the admin workspace. The reservation database migration has been applied to the connected development Supabase project and its migration history reconciled. The three website-listed locations (135 Ossington, 17 Baldwin and 915 Dupont) are seeded in development for admin setup. Reservation rules remain absent and disabled until Rooms confirms them. The Edge Function and frontend integration remain undeployed.
 
 ## Setup and release sequence
 1. Confirm that Rooms controls the Supabase project and hosting, and grant only least-privilege access to implementation staff.
@@ -36,4 +36,4 @@ The feature branch also adds a configurable reservation-settings table, a server
 11. Move off GitHub Pages only when a host supporting the selected server-side/runtime setup is configured. Keep the existing live customer-facing site unchanged until Rooms explicitly accepts the new implementation.
 
 ## Not yet live
-The reservation database migration has been applied to the connected development Supabase project; the Edge Function remains committed to the feature branch and is not deployed. No location rows or booking rules have been configured yet, so guest reservation requests remain disabled. No order/payment integration, payment webhooks, transactional email or live booking form is active. Those steps require Rooms-owned credentials, business decisions, end-to-end testing and explicit deployment approval.
+The reservation database migration has been applied to the connected development Supabase project; the Edge Function remains committed to the feature branch and is not deployed. Location rows are seeded, but verified opening-hour JSON and reservation rules have not been configured, so guest reservation requests remain disabled. No order/payment integration, payment webhooks, transactional email or live booking form is active. Those steps require Rooms-owned credentials, business decisions, end-to-end testing and explicit deployment approval.
