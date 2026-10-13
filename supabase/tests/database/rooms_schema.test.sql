@@ -1,5 +1,5 @@
 begin;
-select plan(29);
+select plan(37);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -130,6 +130,43 @@ select ok(
       )
   ),
   'all staff authorization policies call the private helper'
+);
+
+select has_table('public', 'reservation_settings', 'reservation settings table exists');
+select has_table('public', 'request_rate_limits', 'hashed rate-limit table exists');
+select ok(
+  (select count(*) = 2 from pg_class c
+   join pg_namespace n on n.oid = c.relnamespace
+   where n.nspname = 'public' and c.relkind = 'r'
+     and c.relname = any(array['reservation_settings','request_rate_limits'])
+     and c.relrowsecurity),
+  'RLS is enabled on both reservation-support tables'
+);
+select ok(
+  not has_table_privilege('anon', 'public.reservation_settings', 'SELECT')
+  and not has_table_privilege('authenticated', 'public.reservation_settings', 'SELECT'),
+  'reservation settings are not directly readable by browser roles'
+);
+select ok(
+  not has_table_privilege('authenticated', 'public.request_rate_limits', 'SELECT'),
+  'signed-in browser clients cannot inspect rate-limit keys'
+);
+select ok(
+  not has_function_privilege('anon', 'public.create_guest_reservation(uuid,text,text,text,integer,timestamptz,text)', 'EXECUTE')
+  and not has_function_privilege('authenticated', 'public.create_guest_reservation(uuid,text,text,text,integer,timestamptz,text)', 'EXECUTE')
+  and has_function_privilege('service_role', 'public.create_guest_reservation(uuid,text,text,text,integer,timestamptz,text)', 'EXECUTE'),
+  'only the trusted server role can create guest reservations'
+);
+select ok(
+  not has_function_privilege('anon', 'public.consume_public_rate_limit(text,integer,integer)', 'EXECUTE')
+  and not has_function_privilege('authenticated', 'public.consume_public_rate_limit(text,integer,integer)', 'EXECUTE')
+  and has_function_privilege('service_role', 'public.consume_public_rate_limit(text,integer,integer)', 'EXECUTE'),
+  'only the trusted server role can consume public rate limits'
+);
+select ok(
+  (select column_default like 'false%' from information_schema.columns
+   where table_schema = 'public' and table_name = 'reservation_settings' and column_name = 'enabled'),
+  'new location reservation settings are disabled until configured'
 );
 
 select * from finish();
