@@ -11,7 +11,11 @@ This checklist is deliberately strict. A merged pull request or a green CI run d
 - [x] Restrict order and order-item writes to owner/manager roles in the initial migration.
 - [x] Make order records read-only in the browser admin until trusted payment and fulfillment flows exist.
 - [x] Normalize blank JSON, array, currency, and non-null numeric admin fields.
-- [x] Keep Supabase project URL and publishable browser key separate from server secrets.\n- [x] Add location-specific reservation settings with booking hours, timezone, capacity, duration, interval and advance-booking rules; disabled by default.\n- [x] Add a server-only transactional reservation RPC with capacity locking and server-side rate-limit storage.\n- [x] Add a guest reservation Edge Function with origin allowlisting, payload validation, honeypot handling, rate limits and safe responses.\n- [x] Add a manager-only admin module to configure location reservation rules.
+- [x] Keep Supabase project URL and publishable browser key separate from server secrets.
+- [x] Add location-specific reservation settings with booking hours, timezone, capacity, duration, interval and advance-booking rules; disabled by default.
+- [x] Add a server-only transactional reservation RPC with capacity locking and server-side rate-limit storage.
+- [x] Add a guest reservation Edge Function with origin allowlisting, payload validation, honeypot handling, rate limits and safe responses.
+- [x] Add a manager-only admin module to configure location reservation rules.
 
 ## Must pass before merging
 
@@ -28,7 +32,9 @@ This checklist is deliberately strict. A merged pull request or a green CI run d
 - [ ] Rooms creates and controls the production Supabase project, hosting account, email provider, payment provider, and any anti-spam service.
 - [ ] Rooms approves the privacy notice, data retention policy, access list, cancellation policy, and customer support process.
 - [ ] Reservation rules are documented: opening hours, booking windows, slot intervals, duration, capacity/table model, party-size rules, time zone, grace period, cancellation and rescheduling.
-- [ ] Configure actual opening hours, IANA timezone, capacity, duration, slot interval, advance window, cancellation/rescheduling rules and confirmation workflow for every location.\n- [ ] Apply and test the new reservation migration on a clean disposable database; deploy the reservation Edge Function only after setting `ALLOWED_ORIGINS` and server secrets. Verify concurrent booking attempts cannot exceed capacity and test daylight-saving transitions.\n- [ ] Add CAPTCHA/managed anti-bot verification if abuse testing or business risk requires it; current controls are origin allowlisting, hashed-IP/email rate limits and a honeypot.
+- [ ] Configure actual opening hours, IANA timezone, capacity, duration, slot interval, advance window, cancellation/rescheduling rules and confirmation workflow for every location.
+- [ ] Apply and test the new reservation migration on a clean disposable database; deploy the reservation Edge Function only after setting `ALLOWED_ORIGINS` and server secrets. Verify concurrent booking attempts cannot exceed capacity and test daylight-saving transitions.
+- [ ] Add CAPTCHA/managed anti-bot verification if abuse testing or business risk requires it; current controls are origin allowlisting, hashed-IP/email rate limits and a honeypot.
 - [ ] Select Rooms' payment provider and checkout model before implementing a server-side order endpoint that calculates totals from trusted product records and reserves inventory atomically. Do not enable checkout until cancellation/expiry and inventory-release rules are implemented.
 - [ ] Payment integration verifies signed webhooks, is idempotent, reconciles refunds, and handles failed/abandoned payments.
 - [ ] Select an email/SMS provider and sender domain; configure transactional templates, sender-domain authentication, delivery failures and retry rules.
