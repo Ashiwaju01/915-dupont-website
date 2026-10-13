@@ -13,7 +13,7 @@
     orders:{title:'Orders',desc:'Read-only order review. Payment state and totals stay locked until verified server-side payment webhooks and order controls are implemented.',table:'orders',readonly:true,fields:[],columns:['order_number','customer_name','customer_email','status','total_cents','payment_status','id']},
     catering_enquiries:{title:'Catering enquiries',desc:'Follow up on catering and event enquiries.',table:'catering_enquiries',fields:[['name','Name','text',true],['email','Email','email',true],['phone','Phone','text'],['event_date','Event date','date'],['guest_count','Guest count','number'],['event_type','Event type','text'],['message','Message','textarea',true],['status','Status','select',true,['new','in_review','responded','closed']],['internal_notes','Internal notes','textarea']],columns:['name','email','event_date','guest_count','status','id']},
     site_content:{title:'Website content',desc:'Edit published page content and metadata.',table:'site_content',fields:[['content_key','Content key','text',true],['title','Title','text'],['body','Body copy','textarea'],['image_url','Image URL','url'],['metadata','Metadata (JSON)','textarea'],['is_published','Published','checkbox']],columns:['content_key','title','is_published','updated_at','id']},
-    profiles:{title:'Staff & access',desc:'Owner-only view of profiles. Role changes should be performed by an authorized owner after identity verification.',table:'profiles',readonly:true,fields:[],columns:['full_name','phone','role','active','created_at','id']},
+    reservation_settings:{title:'Reservation settings',desc:'Configure booking rules for each location. Use 24-hour opening times in the JSON editor; settings remain disabled until enabled.',table:'reservation_settings',keyField:'location_id',orderBy:'updated_at',fields:[['location_id','Location ID','text',true],['enabled','Bookings enabled','checkbox'],['timezone','IANA timezone (e.g. America/Toronto)','text',true],['capacity','Total guest capacity per overlapping booking window','number',true],['duration_minutes','Reservation duration (minutes)','number',true],['slot_interval_minutes','Booking slot interval (minutes)','number',true],['max_advance_days','Maximum days ahead','number',true],['min_advance_minutes','Minimum minutes before booking','number',true],['max_party_size','Maximum party size','number',true],['opening_hours','Opening hours JSON','textarea',true]],columns:['location_id','enabled','timezone','capacity','duration_minutes','slot_interval_minutes','max_advance_days','min_advance_minutes','max_party_size','updated_at']},\n    profiles:{title:'Staff & access',desc:'Owner-only view of profiles. Role changes should be performed by an authorized owner after identity verification.',table:'profiles',readonly:true,fields:[],columns:['full_name','phone','role','active','created_at','id']},
     audit_logs:{title:'Audit log',desc:'Review recorded staff actions.',table:'audit_logs',readonly:true,fields:[],columns:['created_at','actor_id','action','entity_type','entity_id','id']}
   };
   let client=null, currentUser=null, currentRole=null, activeModule='overview', records=[], editingId=null;
@@ -56,7 +56,7 @@
     $('#pageTitle').textContent=overview?'Overview':(moduleConfig[name]?.title||name);
     if(overview){await loadOverview();return;}
     const cfg=moduleConfig[name];if(!cfg)return;
-    if(name==='profiles'&&currentRole!=='owner'||name==='audit_logs'&&!['owner','manager'].includes(currentRole)){notice('Your role does not have access to this module.',true);return;}
+    if(name==='profiles'&&currentRole!=='owner'||['audit_logs','reservation_settings'].includes(name)&&!['owner','manager'].includes(currentRole)){notice('Your role does not have access to this module.',true);return;}
     $('#moduleHeading').textContent=cfg.title;$('#moduleDescription').textContent=cfg.desc;$('#addRecord').classList.toggle('hidden',Boolean(cfg.readonly));$('#searchRecords').value='';await loadRecords();
   }
   async function loadOverview(){
@@ -69,7 +69,7 @@
   async function loadRecords(){
     const cfg=moduleConfig[activeModule];if(!cfg||!client)return;
     $('#recordsTable').innerHTML='<div class="empty">Loading records…</div>';$('#moduleMessage').textContent='';
-    const {data,error}=await client.from(cfg.table).select('*').order('created_at',{ascending:false}).limit(250);
+    const {data,error}=await client.from(cfg.table).select('*').order(cfg.orderBy||'created_at',{ascending:false}).limit(250);
     if(error){records=[];$('#recordsTable').innerHTML='<div class="empty">Could not load records: '+escapeHtml(error.message)+'</div>';return;}
     records=data||[];renderRecords();
   }
@@ -82,7 +82,7 @@
     const needle=$('#searchRecords').value.trim().toLowerCase();
     const filtered=records.filter(r=>!needle||Object.values(r).some(v=>String(v??'').toLowerCase().includes(needle)));
     $('#recordsTable').innerHTML=tableHtml(filtered,cfg.columns,!cfg.readonly);
-    $('#recordsTable').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openForm(records.find(r=>r.id===b.dataset.edit))));
+    $('#recordsTable').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openForm(records.find(r=>String(r[cfg.keyField||'id'])===b.dataset.edit))));
     $('#recordsTable').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteRecord(b.dataset.delete)));
   }
   function openForm(record=null){
@@ -112,7 +112,7 @@
     if(activeModule==='reservations'&&!editingId)payload.status='pending';
     $('#saveRecord').disabled=true;$('#formMessage').textContent='Saving…';
     let query;
-    if(editingId)query=client.from(cfg.table).update(payload).eq('id',editingId);
+    const keyField=cfg.keyField||'id';if(editingId)query=client.from(cfg.table).update(payload).eq(keyField,editingId);
     else query=client.from(cfg.table).insert(payload);
     const {error}=await query;
     $('#saveRecord').disabled=false;
@@ -121,7 +121,7 @@
   }
   async function deleteRecord(id){
     const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly||!confirm('Delete this record? This may be blocked if other records depend on it.'))return;
-    const {error}=await client.from(cfg.table).delete().eq('id',id);
+    const {error}=await client.from(cfg.table).delete().eq(cfg.keyField||'id',id);
     if(error){notice('Delete failed: '+error.message,true);return;}
     notice('Record deleted.');await loadRecords();
   }
