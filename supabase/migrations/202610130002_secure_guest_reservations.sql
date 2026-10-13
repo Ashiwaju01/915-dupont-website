@@ -165,7 +165,8 @@ begin
     if v_open >= v_close then
       raise exception using errcode = '22023', message = 'Overnight opening windows are not supported';
     end if;
-    if v_local_start::time >= v_open
+    if extract(second from v_local_start) = 0
+       and v_local_start::time >= v_open
        and v_local_start::time < v_close
        and v_local_end::time <= v_close
        and v_local_end::date = v_local_start::date
