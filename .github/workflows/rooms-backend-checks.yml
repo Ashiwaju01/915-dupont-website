@@ -33,6 +33,14 @@ jobs:
       - name: Check admin JavaScript syntax
         run: node --check admin/admin.js
 
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check reservation Edge Function
+        run: deno check supabase/functions/reservation-create/index.ts
+
       - name: Check patch whitespace
         run: git diff --check
 
