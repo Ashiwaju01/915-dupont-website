@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
     || !guestName || !guestEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)
     || (body.guestPhone != null && body.guestPhone !== "" && !guestPhone)
     || !Number.isInteger(partySize) || partySize < 1 || partySize > 20
-    || !startsAt || !/(Z|[+-]\\d{2}:\\d{2})$/i.test(startsAt) || Number.isNaN(Date.parse(startsAt))
+    || !startsAt || !/(Z|[+-]\d{2}:\d{2})$/i.test(startsAt) || Number.isNaN(Date.parse(startsAt))
     || (body.customerNotes != null && body.customerNotes !== "" && customerNotes === null)) {
     return respond(req, 400, { error: "Check the name, email, party size and requested date/time." });
   }
