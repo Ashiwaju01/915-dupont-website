@@ -202,7 +202,7 @@ select ok(
 select ok(
   (select coalesce(qual, '') like '%owner%'
           and coalesce(qual, '') like '%manager%'
-          and coalesce(qual, '') not like '%staff%'
+          and coalesce(qual, '') not like '%''staff''::staff_role%'
    from pg_policies
    where schemaname = 'public' and tablename = 'orders'
      and policyname = 'managers manage orders' and cmd = 'ALL'),
@@ -211,7 +211,7 @@ select ok(
 select ok(
   (select coalesce(qual, '') like '%owner%'
           and coalesce(qual, '') like '%manager%'
-          and coalesce(qual, '') not like '%staff%'
+          and coalesce(qual, '') not like '%''staff''::staff_role%'
    from pg_policies
    where schemaname = 'public' and tablename = 'order_items'
      and policyname = 'managers manage order items' and cmd = 'ALL'),
@@ -225,7 +225,7 @@ select ok(
 select ok(
   (select coalesce(qual, '') like '%owner%'
           and coalesce(qual, '') like '%manager%'
-          and coalesce(qual, '') not like '%staff%'
+          and coalesce(qual, '') not like '%''staff''::staff_role%'
    from pg_policies
    where schemaname = 'public' and tablename = 'reservation_settings'
      and policyname = 'managers manage reservation settings' and cmd = 'ALL'),
@@ -234,7 +234,7 @@ select ok(
 select ok(
   (select coalesce(qual, '') like '%owner%'
           and coalesce(qual, '') like '%manager%'
-          and coalesce(qual, '') not like '%staff%'
+          and coalesce(qual, '') not like '%''staff''::staff_role%'
    from pg_policies
    where schemaname = 'public' and tablename = 'audit_logs'
      and policyname = 'owner and managers read audit logs' and cmd = 'SELECT'),
