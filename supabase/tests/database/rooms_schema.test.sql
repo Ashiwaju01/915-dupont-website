@@ -1,5 +1,5 @@
 begin;
-select plan(40);
+select plan(45);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -187,5 +187,42 @@ select ok(
   'customer direct reservation insert policy is disabled until endpoint validation exists'
 );
 
+select ok(
+  (select count(*) = 1 from pg_policies
+   where schemaname = 'public' and tablename = 'orders'
+     and cmd in ('INSERT', 'UPDATE', 'DELETE', 'ALL')
+     and policyname = 'managers manage orders'),
+  'orders have exactly one mutating policy, reserved for owner/manager'
+);
+select ok(
+  (select count(*) = 1 from pg_policies
+   where schemaname = 'public' and tablename = 'order_items'
+     and cmd in ('INSERT', 'UPDATE', 'DELETE', 'ALL')
+     and policyname = 'managers manage order items'),
+  'order items have exactly one mutating policy, reserved for owner/manager'
+);
+select ok(
+  (select coalesce(qual, '') like '%owner%'
+          and coalesce(qual, '') like '%manager%'
+          and coalesce(qual, '') not like '%staff%'
+   from pg_policies
+   where schemaname = 'public' and tablename = 'orders'
+     and policyname = 'managers manage orders' and cmd = 'ALL'),
+  'order mutation policy excludes staff and customers'
+);
+select ok(
+  (select coalesce(qual, '') like '%owner%'
+          and coalesce(qual, '') like '%manager%'
+          and coalesce(qual, '') not like '%staff%'
+   from pg_policies
+   where schemaname = 'public' and tablename = 'order_items'
+     and policyname = 'managers manage order items' and cmd = 'ALL'),
+  'order-item mutation policy excludes staff and customers'
+);
+select ok(
+  not has_table_privilege('authenticated', 'public.orders', 'TRUNCATE')
+  and not has_table_privilege('authenticated', 'public.order_items', 'TRUNCATE'),
+  'browser-authenticated users cannot truncate financial tables'
+);
 select * from finish();
 rollback;
