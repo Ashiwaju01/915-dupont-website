@@ -1,5 +1,5 @@
 begin;
-select plan(45);
+select plan(49);
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -221,6 +221,41 @@ select ok(
   not has_table_privilege('authenticated', 'public.orders', 'TRUNCATE')
   and not has_table_privilege('authenticated', 'public.order_items', 'TRUNCATE'),
   'browser-authenticated users cannot truncate financial tables'
+);
+select ok(
+  (select coalesce(qual, '') like '%owner%'
+          and coalesce(qual, '') like '%manager%'
+          and coalesce(qual, '') not like '%staff%'
+   from pg_policies
+   where schemaname = 'public' and tablename = 'reservation_settings'
+     and policyname = 'managers manage reservation settings' and cmd = 'ALL'),
+  'only owners and managers can change reservation settings'
+);
+select ok(
+  (select coalesce(qual, '') like '%owner%'
+          and coalesce(qual, '') like '%manager%'
+          and coalesce(qual, '') not like '%staff%'
+   from pg_policies
+   where schemaname = 'public' and tablename = 'audit_logs'
+     and policyname = 'owner and managers read audit logs' and cmd = 'SELECT'),
+  'staff and customers cannot read the audit log'
+);
+select ok(
+  (select coalesce(with_check, '') like '%customer%'
+   from pg_policies
+   where schemaname = 'public' and tablename = 'profiles'
+     and policyname = 'profile update self basic' and cmd = 'UPDATE'),
+  'self-service profile updates cannot promote a customer to staff'
+);
+select ok(
+  (select count(*) = 2
+          and bool_and(coalesce(qual, '') like '%owner%'
+                       and coalesce(qual, '') like '%manager%'
+                       and coalesce(qual, '') like '%staff%')
+   from pg_policies
+   where schemaname = 'public' and tablename = 'reservation_internal_notes'
+     and cmd in ('SELECT', 'ALL')),
+  'reservation internal notes are restricted to staff roles'
 );
 select * from finish();
 rollback;
