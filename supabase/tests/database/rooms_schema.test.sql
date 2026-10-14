@@ -190,15 +190,13 @@ select ok(
 select ok(
   (select count(*) = 1 from pg_policies
    where schemaname = 'public' and tablename = 'orders'
-     and cmd in ('INSERT', 'UPDATE', 'DELETE', 'ALL')
-     and policyname = 'managers manage orders'),
+     and cmd in ('INSERT', 'UPDATE', 'DELETE', 'ALL')),
   'orders have exactly one mutating policy, reserved for owner/manager'
 );
 select ok(
   (select count(*) = 1 from pg_policies
    where schemaname = 'public' and tablename = 'order_items'
-     and cmd in ('INSERT', 'UPDATE', 'DELETE', 'ALL')
-     and policyname = 'managers manage order items'),
+     and cmd in ('INSERT', 'UPDATE', 'DELETE', 'ALL')),
   'order items have exactly one mutating policy, reserved for owner/manager'
 );
 select ok(
