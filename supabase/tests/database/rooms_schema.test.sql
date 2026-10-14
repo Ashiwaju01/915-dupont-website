@@ -1,5 +1,37 @@
 begin;
-select plan(49);
+select plan(56);
+
+-- Authorization-matrix fixtures are isolated by this file's outer transaction and rollback.
+-- Auth triggers create customer profiles; trusted test setup promotes selected fixtures.
+insert into auth.users (
+  id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+) values
+  ('11111111-1111-4111-8111-111111111101', 'authenticated', 'authenticated', 'rooms-customer@example.test', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
+  ('11111111-1111-4111-8111-111111111102', 'authenticated', 'authenticated', 'rooms-other-customer@example.test', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
+  ('11111111-1111-4111-8111-111111111103', 'authenticated', 'authenticated', 'rooms-staff@example.test', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
+  ('11111111-1111-4111-8111-111111111104', 'authenticated', 'authenticated', 'rooms-manager@example.test', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
+  ('11111111-1111-4111-8111-111111111105', 'authenticated', 'authenticated', 'rooms-owner@example.test', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now());
+
+update public.profiles set role = 'staff'
+where id = '11111111-1111-4111-8111-111111111103';
+update public.profiles set role = 'manager'
+where id = '11111111-1111-4111-8111-111111111104';
+update public.profiles set role = 'owner'
+where id = '11111111-1111-4111-8111-111111111105';
+
+insert into public.orders (
+  id, customer_id, customer_email, customer_name, subtotal_cents, total_cents
+) values
+  ('22222222-2222-4222-8222-222222222201', '11111111-1111-4111-8111-111111111101', 'rooms-customer@example.test', 'Test Customer', 1200, 1200),
+  ('22222222-2222-4222-8222-222222222202', '11111111-1111-4111-8111-111111111102', 'rooms-other-customer@example.test', 'Other Customer', 2400, 2400);
+
+insert into public.order_items (
+  id, order_id, product_name, quantity, unit_price_cents, line_total_cents
+) values
+  ('33333333-3333-4333-8333-333333333301', '22222222-2222-4222-8222-222222222201', 'Test item', 1, 1200, 1200),
+  ('33333333-3333-4333-8333-333333333302', '22222222-2222-4222-8222-222222222202', 'Other item', 1, 2400, 2400);
+
 
 select has_table('public', 'profiles', 'profiles table exists');
 select has_table('public', 'locations', 'locations table exists');
@@ -257,5 +289,54 @@ select ok(
      and cmd in ('SELECT', 'ALL')),
   'reservation internal notes are restricted to staff roles'
 );
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111101', true);
+select is((select count(*)::integer from public.orders), 1, 'customer can read only their own order');
+select is((select count(*)::integer from public.order_items), 1, 'customer can read only items belonging to their own order');
+select is(
+  (with changed as (
+     update public.orders set total_cents = 99999
+     where id = '22222222-2222-4222-8222-222222222201'
+     returning id
+   ) select count(*)::integer from changed),
+  0,
+  'customer cannot alter even their own order total'
+);
+
+select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111103', true);
+select is((select count(*)::integer from public.orders), 2, 'staff can read all orders for service');
+select is(
+  (with changed as (
+     update public.orders set total_cents = 99999
+     where id = '22222222-2222-4222-8222-222222222201'
+     returning id
+   ) select count(*)::integer from changed),
+  0,
+  'staff cannot alter order totals'
+);
+
+select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111104', true);
+select is(
+  (with changed as (
+     update public.orders set total_cents = 1300
+     where id = '22222222-2222-4222-8222-222222222201'
+     returning id
+   ) select count(*)::integer from changed),
+  1,
+  'manager can perform authorized order management'
+);
+
+select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111105', true);
+select is(
+  (with changed as (
+     update public.orders set total_cents = 1400
+     where id = '22222222-2222-4222-8222-222222222201'
+     returning id
+   ) select count(*)::integer from changed),
+  1,
+  'owner can perform authorized order management'
+);
+reset role;
+
 select * from finish();
 rollback;
