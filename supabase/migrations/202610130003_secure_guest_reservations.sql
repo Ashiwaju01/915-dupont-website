@@ -192,7 +192,7 @@ begin
     raise exception using errcode = 'P0001', message = 'No capacity remains for the requested time';
   end if;
 
-  insert into public.reservations(
+  insert into public.reservations as reservation_row (
     location_id, guest_name, guest_email, guest_phone, party_size,
     starts_at, ends_at, status, customer_notes
   ) values (
@@ -200,7 +200,7 @@ begin
     nullif(btrim(coalesce(p_guest_phone, '')), ''), p_party_size,
     p_starts_at, v_end, 'pending', nullif(btrim(coalesce(p_customer_notes, '')), '')
   )
-  returning id, confirmation_code into v_id, v_code;
+  returning reservation_row.id, reservation_row.confirmation_code into v_id, v_code;
 
   return query select v_id, v_code, p_starts_at, v_end;
 end;
