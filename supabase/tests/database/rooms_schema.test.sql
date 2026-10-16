@@ -293,49 +293,25 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111101', true);
 select is((select count(*)::integer from public.orders), 1, 'customer can read only their own order');
 select is((select count(*)::integer from public.order_items), 1, 'customer can read only items belonging to their own order');
-select is(
-  (with changed as (
-     update public.orders set total_cents = 99999
-     where id = '22222222-2222-4222-8222-222222222201'
-     returning id
-   ) select count(*)::integer from changed),
-  0,
-  'customer cannot alter even their own order total'
-);
+update public.orders set total_cents = 99999
+where id = '22222222-2222-4222-8222-222222222201';
+select is((select total_cents from public.orders where id = '22222222-2222-4222-8222-222222222201'), 1200, 'customer cannot alter even their own order total');
 
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111103', true);
 select is((select count(*)::integer from public.orders), 2, 'staff can read all orders for service');
-select is(
-  (with changed as (
-     update public.orders set total_cents = 99999
-     where id = '22222222-2222-4222-8222-222222222201'
-     returning id
-   ) select count(*)::integer from changed),
-  0,
-  'staff cannot alter order totals'
-);
+update public.orders set total_cents = 99999
+where id = '22222222-2222-4222-8222-222222222201';
+select is((select total_cents from public.orders where id = '22222222-2222-4222-8222-222222222201'), 1200, 'staff cannot alter order totals');
 
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111104', true);
-select is(
-  (with changed as (
-     update public.orders set total_cents = 1300
-     where id = '22222222-2222-4222-8222-222222222201'
-     returning id
-   ) select count(*)::integer from changed),
-  1,
-  'manager can perform authorized order management'
-);
+update public.orders set total_cents = 1300
+where id = '22222222-2222-4222-8222-222222222201';
+select is((select total_cents from public.orders where id = '22222222-2222-4222-8222-222222222201'), 1300, 'manager can perform authorized order management');
 
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111105', true);
-select is(
-  (with changed as (
-     update public.orders set total_cents = 1400
-     where id = '22222222-2222-4222-8222-222222222201'
-     returning id
-   ) select count(*)::integer from changed),
-  1,
-  'owner can perform authorized order management'
-);
+update public.orders set total_cents = 1400
+where id = '22222222-2222-4222-8222-222222222201';
+select is((select total_cents from public.orders where id = '22222222-2222-4222-8222-222222222201'), 1400, 'owner can perform authorized order management');
 reset role;
 
 select * from finish();
