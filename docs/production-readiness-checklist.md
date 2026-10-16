@@ -19,8 +19,8 @@ This checklist is deliberately strict. A merged pull request or a green CI run d
 
 ## Must pass before merging
 
-- [x] GitHub Actions database lint completes successfully (run 38349469824).
-- [x] GitHub Actions database tests complete successfully (run 38349469824).
+- [x] GitHub Actions database lint completes successfully (run 38898836317).
+- [x] GitHub Actions database tests complete successfully (run 38898836317).
 - [x] Review migrations against a clean local Supabase database in CI.
 - [ ] Review all RLS policies using anonymous, customer, staff, manager, and owner test identities.
 - [ ] Confirm staff cannot write order totals, payment status, payment references, or order items.
@@ -60,4 +60,4 @@ The GitHub Actions workflow runs the lint and database tests on matching pull re
 
 ## Important limitation
 
-The schema and reservation endpoint are still pre-release. The database migrations (including reservation settings, rate limiting, and the transactional guest-reservation RPC) have been applied to the connected development Supabase project and its migration history reconciled. The Edge Function is committed to the feature branch but has not been deployed. No locations or reservation rules have been configured, so the reservation RPC fails closed. RLS smoke tests do not replace a full authorization matrix, transactional concurrency tests, provider webhook tests, or live end-to-end acceptance. The current public reservation function intentionally has JWT verification disabled because guests are not signed in; it must be deployed only with `ALLOWED_ORIGINS` set and the required server secrets configured. CI run 38349469824 passed admin JavaScript syntax, Deno type-checking, migration-version uniqueness, local Supabase startup, migration lint and database tests. The reservation timestamp timezone-offset validator was corrected afterward and needs a fresh CI pass.
+The schema and reservation endpoint are still pre-release. The database migrations (including reservation settings, rate limiting, and the transactional guest-reservation RPC) have been applied to the connected development Supabase project and its migration history reconciled. The Edge Function is committed to the feature branch but has not been deployed. No locations or reservation rules have been configured, so the reservation RPC fails closed. RLS smoke tests do not replace a full authorization matrix, transactional concurrency tests, provider webhook tests, or live end-to-end acceptance. The current public reservation function intentionally has JWT verification disabled because guests are not signed in; it must be deployed only with `ALLOWED_ORIGINS` set and the required server secrets configured. CI run 38898836317 passed admin JavaScript syntax, Deno type-checking, whitespace checks, migration-version uniqueness, local Supabase startup, migration lint and database tests after the reservation timestamp validator, seeded locations, and RLS test fixes. The connected database was also updated with the corrected reservation RPC and verified.
