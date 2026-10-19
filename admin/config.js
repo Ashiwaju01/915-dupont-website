@@ -1,5 +1,5 @@
-// Publishable browser key only. RLS and server-side validation protect all data.
+// Production browser config. Publishable key only; never put service-role secrets here.
 window.ROOMS_SUPABASE_CONFIG = {
-  url: 'https://dsxmkbnljpjzwnkqrgno.supabase.co',
-  anonKey: 'sb_publishable_mG2wtbV_xtHs-vEifjetMQ_szCPRZZ9'
+  url: 'https://pozibusbtsajqaqeggjj.supabase.co',
+  anonKey: 'sb_publishable_lDA0r95AptZq48NGPKkQmA_hCsarX1x'
 };
