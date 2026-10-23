@@ -13,6 +13,8 @@ on:
     paths:
       - "supabase/**"
       - "admin/**"
+      - "index.html"
+      - "script.js"
       - ".github/workflows/rooms-backend-checks.yml"
   workflow_dispatch:
 
