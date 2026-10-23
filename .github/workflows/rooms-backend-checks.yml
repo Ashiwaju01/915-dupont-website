@@ -5,6 +5,8 @@ on:
     paths:
       - "supabase/**"
       - "admin/**"
+      - "index.html"
+      - "script.js"
       - ".github/workflows/rooms-backend-checks.yml"
   push:
     branches: ["main", "feature/rooms-backend-foundation"]
@@ -30,8 +32,10 @@ jobs:
         with:
           version: latest
 
-      - name: Check admin JavaScript syntax
-        run: node --check admin/admin.js
+      - name: Check JavaScript syntax
+        run: |
+          node --check admin/admin.js
+          node --check script.js
 
       - name: Install Deno
         uses: denoland/setup-deno@v2
