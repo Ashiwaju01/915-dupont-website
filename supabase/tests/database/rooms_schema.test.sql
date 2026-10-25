@@ -1,5 +1,5 @@
 begin;
-select plan(56);
+select plan(62);
 
 -- Authorization-matrix fixtures are isolated by this file's outer transaction and rollback.
 -- Auth triggers create customer profiles; trusted test setup promotes selected fixtures.
@@ -207,6 +207,44 @@ select ok(
   (select column_default like 'false%' from information_schema.columns
    where table_schema = 'public' and table_name = 'reservation_settings' and column_name = 'enabled'),
   'new location reservation settings are disabled until configured'
+);
+
+
+select is(
+  (select count(*)::integer from public.reservation_settings
+   where location_id in (select id from public.locations where slug in ('ossington','baldwin','dupont'))),
+  3,
+  'each Rooms location has reservation settings'
+);
+select ok(
+  (select count(*) = 3 and bool_and(slot_interval_minutes = 60)
+   from public.reservation_settings s join public.locations l on l.id = s.location_id
+   where l.slug in ('ossington','baldwin','dupont')),
+  'all locations use the confirmed 60-minute slot interval'
+);
+select ok(
+  (select count(*) = 3 and bool_and(max_advance_days = 30)
+   from public.reservation_settings s join public.locations l on l.id = s.location_id
+   where l.slug in ('ossington','baldwin','dupont')),
+  'all locations use the confirmed 30-day advance booking window'
+);
+select ok(
+  (select count(*) = 3 and bool_and(min_advance_minutes = 1440)
+   from public.reservation_settings s join public.locations l on l.id = s.location_id
+   where l.slug in ('ossington','baldwin','dupont')),
+  'all locations require the confirmed 24-hour minimum notice'
+);
+select ok(
+  (select count(*) = 3 and bool_and(capacity is null and not enabled)
+   from public.reservation_settings s join public.locations l on l.id = s.location_id
+   where l.slug in ('ossington','baldwin','dupont')),
+  'all locations remain disabled with capacity unset until Rooms confirms it'
+);
+select ok(
+  (select count(*) = 3 and bool_and(timezone = 'America/Toronto')
+   from public.reservation_settings s join public.locations l on l.id = s.location_id
+   where l.slug in ('ossington','baldwin','dupont')),
+  'all locations use the Toronto time zone'
 );
 
 select ok(
