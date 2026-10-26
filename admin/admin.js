@@ -5,7 +5,7 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const moduleConfig = {
-    reservations:{title:'Reservations',desc:'Review bookings and update their status.',table:'reservations',fields:[['guest_name','Guest name','text',true],['guest_email','Email','email',true],['guest_phone','Phone','text'],['location_id','Location','select',true,'locations'],['party_size','Party size','number',true],['starts_at','Start date and time','datetime-local',true],['ends_at','End date and time','datetime-local'],['status','Status','select',true,['pending','confirmed','cancelled','completed','no_show']],['customer_notes','Guest notes','textarea']],columns:['confirmation_code','guest_name','guest_email','party_size','starts_at','status','id']},
+    reservations:{title:'Reservations',desc:'Review bookings and update their status. Guest details, party size and booking times are locked here so staff edits cannot bypass capacity checks.',table:'reservations',allowCreate:false,allowDelete:false,fields:[['status','Status','select',true,['pending','confirmed','cancelled','completed','no_show']]],columns:['confirmation_code','guest_name','guest_email','party_size','starts_at','status','id']},
     locations:{title:'Locations',desc:'Manage locations, addresses and opening hours.',table:'locations',fields:[['name','Name','text',true],['slug','URL slug','text',true],['address','Address','text',true],['description','Description','textarea'],['phone','Phone','text'],['email','Email','email'],['opening_hours','Opening hours (JSON)','textarea'],['is_active','Active','checkbox'],['sort_order','Sort order','number']],columns:['name','slug','address','is_active','sort_order','id']},
     menu_categories:{title:'Menu categories',desc:'Organize menus by category and location.',table:'menu_categories',fields:[['name','Name','text',true],['slug','Slug','text',true],['location_id','Location (optional)','select',false,'locations'],['description','Description','textarea'],['sort_order','Sort order','number'],['is_active','Active','checkbox']],columns:['name','slug','location_id','is_active','sort_order','id']},
     menu_items:{title:'Menu items',desc:'Manage menu copy, prices and availability. Prices are stored in cents.',table:'menu_items',fields:[['category_id','Menu category','select',true,'menu_categories'],['name','Name','text',true],['description','Description','textarea'],['price_cents','Price in cents (e.g. 650 = $6.50)','number',true],['currency','Currency (ISO code)','text',true],['image_url','Image URL','url'],['dietary_tags','Dietary tags (comma-separated)','text'],['is_available','Available','checkbox'],['sort_order','Sort order','number']],columns:['name','price_cents','currency','is_available','category_id','id']},
@@ -58,7 +58,7 @@
     if(overview){await loadOverview();return;}
     const cfg=moduleConfig[name];if(!cfg)return;
     if(name==='profiles'&&currentRole!=='owner'||['audit_logs','reservation_settings'].includes(name)&&!['owner','manager'].includes(currentRole)){notice('Your role does not have access to this module.',true);return;}
-    $('#moduleHeading').textContent=cfg.title;$('#moduleDescription').textContent=cfg.desc;$('#addRecord').classList.toggle('hidden',Boolean(cfg.readonly));$('#searchRecords').value='';await loadRecords();
+    $('#moduleHeading').textContent=cfg.title;$('#moduleDescription').textContent=cfg.desc;$('#addRecord').classList.toggle('hidden',Boolean(cfg.readonly || cfg.allowCreate===false));$('#searchRecords').value='';await loadRecords();
   }
   async function loadOverview(){
     const counts=[['Reservations','reservations'],['Shop products','products'],['Orders','orders'],['Open enquiries','catering_enquiries']];
@@ -74,20 +74,20 @@
     if(error){records=[];$('#recordsTable').innerHTML='<div class="empty">Could not load records: '+escapeHtml(error.message)+'</div>';return;}
     records=data||[];renderRecords();
   }
-  function tableHtml(rows,cols,actions,keyField='id'){
+  function tableHtml(rows,cols,actions,keyField='id',canDelete=true){
     if(!rows.length)return '<div class="empty">No records yet.</div>';
-    return '<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c.replaceAll('_',' '))+'</th>').join('')+(actions?'<th>Actions</th>':'')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+cols.map(c=>'<td>'+(c==='status'||c==='role'||c==='payment_status'?'<span class="pill">'+escapeHtml(fmt(row[c]))+'</span>':escapeHtml(fmt(row[c])))+'</td>').join('')+(actions?'<td><button class="table-action" data-edit="'+escapeHtml(row[keyField])+'">Edit</button><button class="table-action delete" data-delete="'+escapeHtml(row[keyField])+'">Delete</button></td>':'')+'</tr>').join('')+'</tbody></table>';
+    return '<table><thead><tr>'+cols.map(c=>'<th>'+escapeHtml(c.replaceAll('_',' '))+'</th>').join('')+(actions?'<th>Actions</th>':'')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+cols.map(c=>'<td>'+(c==='status'||c==='role'||c==='payment_status'?'<span class="pill">'+escapeHtml(fmt(row[c]))+'</span>':escapeHtml(fmt(row[c])))+'</td>').join('')+(actions?'<td><button class="table-action" data-edit="'+escapeHtml(row[keyField])+'">Edit</button>'+(canDelete?'<button class="table-action delete" data-delete="'+escapeHtml(row[keyField])+'">Delete</button>':'')+'</td>':'')+'</tr>').join('')+'</tbody></table>';
   }
   function renderRecords(){
     const cfg=moduleConfig[activeModule];if(!cfg)return;
     const needle=$('#searchRecords').value.trim().toLowerCase();
     const filtered=records.filter(r=>!needle||Object.values(r).some(v=>String(v??'').toLowerCase().includes(needle)));
-    $('#recordsTable').innerHTML=tableHtml(filtered,cfg.columns,!cfg.readonly,cfg.keyField||'id');
+    $('#recordsTable').innerHTML=tableHtml(filtered,cfg.columns,!cfg.readonly,cfg.keyField||'id',cfg.allowDelete!==false);
     $('#recordsTable').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openForm(records.find(r=>String(r[cfg.keyField||'id'])===b.dataset.edit))));
     $('#recordsTable').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteRecord(b.dataset.delete)));
   }
   async function openForm(record=null){
-    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly)return;
+    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly||(!record&&cfg.allowCreate===false))return;
     const dynamicOptions={};
     if(cfg.fields.some(f=>f[2]==='select'&&f[4]==='locations')){
       const {data,error}=await client.from('locations').select('id,name').eq('is_active',true).order('sort_order');
@@ -123,7 +123,7 @@
   }
   function closeForm(){$('#recordModal').classList.add('hidden');editingId=null;}
   async function saveRecord(e){
-    e.preventDefault();const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly)return;const form=new FormData(e.currentTarget),payload={};
+    e.preventDefault();const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly||(!editingId&&cfg.allowCreate===false))return;const form=new FormData(e.currentTarget),payload={};
     for(const [key,label,type] of cfg.fields.map(f=>[f[0],f[1],f[2]])){
       const field=e.currentTarget.elements.namedItem(key);if(!field)continue;
       if(type==='checkbox'){payload[key]=field.checked;continue;}
@@ -145,7 +145,7 @@
     closeForm();notice('Record saved.');await loadRecords();
   }
   async function deleteRecord(id){
-    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly||!confirm('Delete this record? This may be blocked if other records depend on it.'))return;
+    const cfg=moduleConfig[activeModule];if(!cfg||cfg.readonly||cfg.allowDelete===false||!confirm('Delete this record? This may be blocked if other records depend on it.'))return;
     const {error}=await client.from(cfg.table).delete().eq(cfg.keyField||'id',id);
     if(error){notice('Delete failed: '+error.message,true);return;}
     notice('Record deleted.');await loadRecords();
