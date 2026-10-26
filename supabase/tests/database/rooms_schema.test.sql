@@ -1,5 +1,5 @@
 begin;
-select plan(67);
+select plan(69);
 
 -- Authorization-matrix fixtures are isolated by this file's outer transaction and rollback.
 -- Auth triggers create customer profiles; trusted test setup promotes selected fixtures.
@@ -240,6 +240,25 @@ select ok(
    where l.slug in ('ossington','baldwin','dupont')),
   'all locations remain disabled with the confirmed capacity of six'
 );
+select ok(
+  (select count(*) = 3 and bool_and(
+    opening_hours -> 'monday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+    and opening_hours -> 'tuesday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+    and opening_hours -> 'wednesday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+    and opening_hours -> 'thursday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+    and opening_hours -> 'friday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+    and opening_hours -> 'saturday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+    and opening_hours -> 'sunday' = '[{"open":"08:00","close":"18:30"}]'::jsonb
+  ) from public.locations where slug in ('ossington','baldwin','dupont')),
+  'all locations use the confirmed 08:00–18:30 daily opening hours'
+);
+select ok(
+  (select count(*) = 3 and bool_and(s.opening_hours = l.opening_hours)
+   from public.reservation_settings s join public.locations l on l.id = s.location_id
+   where l.slug in ('ossington','baldwin','dupont')),
+  'reservation settings opening hours match the location opening hours'
+);
+
 select ok(
   (select count(*) = 3 and bool_and(timezone = 'America/Toronto')
    from public.reservation_settings s join public.locations l on l.id = s.location_id
