@@ -1,5 +1,5 @@
 begin;
-select plan(62);
+select plan(67);
 
 -- Authorization-matrix fixtures are isolated by this file's outer transaction and rollback.
 -- Auth triggers create customer profiles; trusted test setup promotes selected fixtures.
@@ -245,6 +245,69 @@ select ok(
    from public.reservation_settings s join public.locations l on l.id = s.location_id
    where l.slug in ('ossington','baldwin','dupont')),
   'all locations use the Toronto time zone'
+);
+
+-- Exercise the reservation RPC against temporary local-test settings. The outer
+-- transaction rolls back these settings and the test reservations at the end.
+update public.reservation_settings s
+set enabled = true,
+    capacity = 6,
+    duration_minutes = 90,
+    slot_interval_minutes = 60,
+    max_advance_days = 30,
+    min_advance_minutes = 1440,
+    timezone = 'America/Toronto',
+    opening_hours = (select l.opening_hours from public.locations l where l.id = s.location_id)
+where s.location_id = (select id from public.locations where slug = 'ossington');
+
+select lives_ok(
+  $select * from public.create_guest_reservation(
+    (select id from public.locations where slug = 'ossington'),
+    'Capacity Test Four', 'capacity-four@example.test', null, 4,
+    ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
+    null
+  )$,
+  'first four-person reservation fits within six-person capacity'
+);
+select throws_ok(
+  $select * from public.create_guest_reservation(
+    (select id from public.locations where slug = 'ossington'),
+    'Capacity Test Three', 'capacity-three@example.test', null, 3,
+    ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
+    null
+  )$,
+  'P0001',
+  'No capacity remains for the requested time',
+  'overlapping reservations cannot exceed six guests'
+);
+select lives_ok(
+  $select * from public.create_guest_reservation(
+    (select id from public.locations where slug = 'ossington'),
+    'Capacity Test Two', 'capacity-two@example.test', null, 2,
+    ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
+    null
+  )$,
+  'second overlapping reservation is accepted when total reaches six'
+);
+select throws_ok(
+  $select * from public.create_guest_reservation(
+    (select id from public.locations where slug = 'ossington'),
+    'Capacity Test One', 'capacity-one@example.test', null, 1,
+    ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
+    null
+  )$,
+  'P0001',
+  'No capacity remains for the requested time',
+  'capacity rejects even one additional guest after six seats are reserved'
+);
+select is(
+  (select coalesce(sum(party_size), 0)::integer
+   from public.reservations r
+   where r.location_id = (select id from public.locations where slug = 'ossington')
+     and r.guest_email in ('capacity-four@example.test', 'capacity-two@example.test')
+     and r.status = 'pending'),
+  6,
+  'successful overlapping test reservations total exactly six guests'
 );
 
 select ok(
