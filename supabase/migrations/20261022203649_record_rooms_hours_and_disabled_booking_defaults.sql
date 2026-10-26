@@ -1,5 +1,5 @@
 -- Reconstruct the previously applied Rooms location-hours and disabled-booking defaults.
--- Opening hours reflect the current database values; Rooms must confirm them before reservations are enabled.
+-- Opening hours use the owner-confirmed 08:00–18:30 daily schedule for all three locations.
 update public.locations
 set opening_hours = jsonb_build_object(
   'monday',    jsonb_build_array(jsonb_build_object('open', '08:00', 'close', '18:30')),
