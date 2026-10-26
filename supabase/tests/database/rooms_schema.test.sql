@@ -235,10 +235,10 @@ select ok(
   'all locations require the confirmed 24-hour minimum notice'
 );
 select ok(
-  (select count(*) = 3 and bool_and(capacity is null and not enabled)
+  (select count(*) = 3 and bool_and(capacity = 6 and not enabled)
    from public.reservation_settings s join public.locations l on l.id = s.location_id
    where l.slug in ('ossington','baldwin','dupont')),
-  'all locations remain disabled with capacity unset until Rooms confirms it'
+  'all locations remain disabled with the confirmed capacity of six'
 );
 select ok(
   (select count(*) = 3 and bool_and(timezone = 'America/Toronto')
