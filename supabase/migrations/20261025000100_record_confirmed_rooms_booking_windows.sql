@@ -1,5 +1,5 @@
 -- Record the booking-window rules confirmed by the project owner.
--- Capacity is still unconfirmed; keep every location disabled and do not enable reservations.
+-- Capacity and booking-window rules are confirmed; keep every location disabled until release checks pass.
 do $$
 declare
   v_updated integer;
