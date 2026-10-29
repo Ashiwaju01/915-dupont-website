@@ -280,41 +280,41 @@ set enabled = true,
 where s.location_id = (select id from public.locations where slug = 'ossington');
 
 select lives_ok(
-  $select * from public.create_guest_reservation(
+  $reservation_test$select * from public.create_guest_reservation(
     (select id from public.locations where slug = 'ossington'),
     'Capacity Test Four', 'capacity-four@example.test', null, 4,
     ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
     null
-  )$,
+  )$reservation_test$,
   'first four-person reservation fits within six-person capacity'
 );
 select throws_ok(
-  $select * from public.create_guest_reservation(
+  $reservation_test$select * from public.create_guest_reservation(
     (select id from public.locations where slug = 'ossington'),
     'Capacity Test Three', 'capacity-three@example.test', null, 3,
     ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
     null
-  )$,
+  )$reservation_test$,
   'P0001',
   'No capacity remains for the requested time',
   'overlapping reservations cannot exceed six guests'
 );
 select lives_ok(
-  $select * from public.create_guest_reservation(
+  $reservation_test$select * from public.create_guest_reservation(
     (select id from public.locations where slug = 'ossington'),
     'Capacity Test Two', 'capacity-two@example.test', null, 2,
     ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
     null
-  )$,
+  )$reservation_test$,
   'second overlapping reservation is accepted when total reaches six'
 );
 select throws_ok(
-  $select * from public.create_guest_reservation(
+  $reservation_test$select * from public.create_guest_reservation(
     (select id from public.locations where slug = 'ossington'),
     'Capacity Test One', 'capacity-one@example.test', null, 1,
     ((date_trunc('day', now() at time zone 'America/Toronto') + interval '2 days' + interval '10 hours') at time zone 'America/Toronto'),
     null
-  )$,
+  )$reservation_test$,
   'P0001',
   'No capacity remains for the requested time',
   'capacity rejects even one additional guest after six seats are reserved'
