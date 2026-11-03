@@ -5,6 +5,7 @@ This branch is an isolated code/CI workspace. Do not point these tests at either
 ## What this branch adds
 
 - `supabase/tests/database/rooms_toronto_dst.test.sql` adds six pgTAP assertions for Toronto's 2026 fall-back and 2027 spring-forward timezone conversions. It also records PostgreSQL's handling of the repeated 01:30 wall-clock time.
+- `supabase/tests/database/rooms_authorization_matrix.test.sql` adds 17 pgTAP assertions covering anonymous grants, customer row isolation, customer/staff financial write denial, staff reservation/note access, staff deactivation, and manager/owner financial permissions.
 - The existing schema suite continues to cover sequential capacity limits and selected RLS/role behavior. Those checks are not concurrency proof and do not yet constitute a complete five-role authorization matrix.
 
 ## No-cost test environment
