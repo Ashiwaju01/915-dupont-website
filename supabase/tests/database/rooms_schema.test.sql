@@ -1,5 +1,5 @@
 begin;
-select plan(69);
+select plan(70);
 
 -- Authorization-matrix fixtures are isolated by this file's outer transaction and rollback.
 -- Auth triggers create customer profiles; trusted test setup promotes selected fixtures.
@@ -190,6 +190,20 @@ select ok(
 select ok(
   not has_table_privilege('authenticated', 'public.request_rate_limits', 'SELECT'),
   'signed-in browser clients cannot inspect rate-limit keys'
+);
+
+select ok(
+  exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename = 'request_rate_limits'
+      and policyname = 'deny browser access to reservation rate limits'
+      and roles @> array['anon','authenticated']::name[]
+      and cmd = 'ALL'
+      and coalesce(qual, '') = 'false'
+      and coalesce(with_check, '') = 'false'
+  ),
+  'anonymous and authenticated clients have an explicit deny-all rate-limit policy'
 );
 select ok(
   not has_function_privilege('anon', 'public.create_guest_reservation(uuid,text,text,text,integer,timestamptz,text)', 'EXECUTE')
