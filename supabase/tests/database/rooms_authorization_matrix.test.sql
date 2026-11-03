@@ -63,8 +63,11 @@ select is((select count(*)::integer from public.reservation_internal_notes), 2, 
 update public.orders set total_cents = 88888 where id = '52222222-2222-4222-8222-222222222201';
 select is((select total_cents from public.orders where id = '52222222-2222-4222-8222-222222222201'), 1000, 'staff cannot change order totals');
 
--- Deactivating a staff identity must immediately remove staff RLS access.
+-- Trusted test setup revokes the staff identity; the same JWT must immediately lose access.
+reset role;
 update public.profiles set active = false where id = '51111111-1111-4111-8111-111111111103';
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '51111111-1111-4111-8111-111111111103', true);
 select is((select count(*)::integer from public.reservations), 0, 'deactivated staff loses reservation access');
 select is((select count(*)::integer from public.reservation_internal_notes), 0, 'deactivated staff loses internal-note access');
 reset role;
