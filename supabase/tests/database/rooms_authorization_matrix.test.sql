@@ -1,5 +1,5 @@
 begin;
-select plan(18);
+select plan(17);
 
 -- Isolated identities and records. This suite runs on the disposable local DB in CI.
 insert into auth.users (
