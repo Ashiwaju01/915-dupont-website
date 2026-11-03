@@ -200,80 +200,131 @@ const body = document.body;
     });
   });
 
-  document.getElementById('bookingForm')?.addEventListener('submit', (e) => {
+  /* ---------- Production reservation request integration ---------- */
+  document.getElementById('bookingForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = document.getElementById('bookingForm');
-    const dateEl = document.getElementById('resDate');
-    const timeEl = document.getElementById('reservationTime');
-    const partyEl = document.getElementById('reservationPartySize');
+    const submitButton = form?.querySelector('button[type="submit"]');
     const confirmBox = document.getElementById('confirmBox');
     const confirmText = confirmBox?.querySelector('p');
-    const locationEl = document.getElementById('reservationLocation');
-    const nameEl = document.getElementById('reservationName');
-    const contactEl = document.getElementById('reservationContact');
     const actionsEl = document.getElementById('confirmActions');
-    const roomName = locationEl?.selectedOptions?.[0]?.textContent?.trim() || 'Rooms';
-    const locationKey = locationEl?.value || '';
-    const party = partyEl?.value || '';
-    const date = dateEl?.value || '';
-    const time = timeEl?.value || '';
-    const guestName = nameEl?.value?.trim() || '';
-    const guestContact = contactEl?.value?.trim() || '';
+    const date = document.getElementById('resDate')?.value || '';
+    const time = document.getElementById('reservationTime')?.value || '';
+    const locationKey = document.getElementById('reservationLocation')?.value || '';
+    const roomName = document.getElementById('reservationLocation')?.selectedOptions?.[0]?.textContent?.trim() || 'Rooms Coffee';
+    const guestName = document.getElementById('reservationName')?.value?.trim() || '';
+    const guestEmail = document.getElementById('reservationContact')?.value?.trim() || '';
+    const partySize = Number(document.getElementById('reservationPartySize')?.value || 0);
     const visitType = document.querySelector('#serviceChips .chip.selected')?.dataset.value || 'Not specified';
     const preorderTotal = preorderItems.reduce((sum, item) => sum + item.price, 0);
-    const preorderLines = preorderItems.length
-      ? preorderItems.map(item => `- ${item.name}: $${item.price} CAD`).join('\n') + `\nPre-order estimate: $${preorderTotal} CAD`
-      : 'No pre-order items selected.';
-    const subject = `Reservation request — ${roomName} — ${date}`;
-    const body = [
-      'Hello Rooms Coffee,',
-      '',
-      'I would like to request a reservation. Please confirm availability.',
-      '',
-      `Location: ${roomName}`,
-      `Name: ${guestName}`,
-      `Contact: ${guestContact}`,
-      `Date: ${date}`,
-      `Preferred time: ${time}`,
-      `Party size: ${party}`,
-      `Visit type: ${visitType}`,
-      '',
-      'Pre-order request:',
-      preorderLines,
-      '',
-      'I understand this is a request and is not confirmed until Rooms replies.',
-      'Thank you.'
-    ].join('\n');
-
-    const knownEmails = {
-      ossington: '135ossington@gmail.com',
-      dupont: '915dupontcafe@gmail.com'
+    const config = window.ROOMS_SUPABASE_CONFIG;
+    const locationIds = {
+      ossington: 'df8d609c-0c42-4e6b-a96b-6788e99aa42c',
+      baldwin: 'e21b5170-67b5-456d-8f49-391403e6b207',
+      dupont: '568f9411-03d0-4a72-b8c0-ae88e7fe6773'
     };
-    const recipient = knownEmails[locationKey];
-    if (actionsEl) {
-      if (recipient) {
-        const mailto = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        actionsEl.innerHTML = `<a class="btn btn-primary confirm-email-btn" href="${mailto}">Open email request ↗</a><p class="confirm-action-note">Your email app will open with the details filled in. The request is not sent until you send the email, and Rooms must confirm availability.</p>`;
-      } else {
-        actionsEl.innerHTML = '<a class="btn btn-primary confirm-email-btn" href="https://roomscoffee.online/pages/locations" target="_blank" rel="noopener">Find official Rooms contact ↗</a><p class="confirm-action-note">We do not have a verified direct email for 17 Baldwin in this concept, so we have not guessed one. Use Rooms’ official site to reach the right team.</p>';
+
+    // Convert the selected Toronto wall-clock time to an ISO instant regardless
+    // of the visitor's browser timezone, accounting for Toronto daylight saving.
+    function torontoLocalToIso(dateValue, timeValue) {
+      const [year, month, day] = dateValue.split('-').map(Number);
+      const [hour, minute] = timeValue.split(':').map(Number);
+      const wallClockUtc = Date.UTC(year, month - 1, day, hour, minute, 0);
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Toronto', year: 'numeric', month: '2-digit',
+        day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hourCycle: 'h23'
+      });
+      const partsFor = instant => Object.fromEntries(
+        formatter.formatToParts(new Date(instant)).filter(p => p.type !== 'literal').map(p => [p.type, Number(p.value)])
+      );
+      let instant = wallClockUtc;
+      for (let i = 0; i < 3; i++) {
+        const p = partsFor(instant);
+        const representedUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+        instant += wallClockUtc - representedUtc;
       }
+      const result = new Date(instant);
+      const parts = partsFor(result.getTime());
+      if (parts.year !== year || parts.month !== month || parts.day !== day || parts.hour !== hour || parts.minute !== minute) {
+        throw new Error('That local time does not exist in Toronto because of the daylight-saving clock change.');
+      }
+      return result.toISOString();
     }
 
-    const formFields = document.getElementById('formFields');
-    if (formFields) formFields.style.display = 'none';
-    confirmBox?.classList.add('show');
-
-    if (confirmText) {
-      confirmText.textContent = `Your request details are ready for ${roomName}: ${party} ${party === '1' ? 'guest' : 'guests'} on ${date} at ${time}. This is not a confirmed reservation; send the request and wait for Rooms to confirm availability.`;
+    if (!config?.url || !config?.anonKey || !locationIds[locationKey]) {
+      if (confirmText) confirmText.textContent = 'Online reservations are not configured yet. Your details have not been sent. Please contact Rooms Coffee directly.';
+      if (actionsEl) actionsEl.innerHTML = '<a class="btn btn-primary confirm-email-btn" href="https://roomscoffee.online/pages/locations" target="_blank" rel="noopener">Contact Rooms Coffee ↗</a>';
+      confirmBox?.classList.add('show');
+      if (submitButton) submitButton.disabled = true;
+      return;
     }
 
-    const cp = document.getElementById('confirmPreorder');
-    if (preorderItems.length && cp) {
-      cp.innerHTML = '<div class="mono" style="font-size:11px; opacity:.6; margin-bottom:8px;">Pre-order estimate</div>' +
-        preorderItems.map(item => `<div class="cp-row"><span>${item.name}</span><span>$${item.price} CAD</span></div>`).join('') +
-        `<div class="cp-row"><strong>Estimated total</strong><strong>$${preorderTotal} CAD</strong></div>`;
-    } else if (cp) {
-      cp.innerHTML = '';
+    let startsAt;
+    try {
+      startsAt = torontoLocalToIso(date, time);
+    } catch (error) {
+      alert(error.message || 'Please choose a valid Toronto date and time.');
+      return;
+    }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.dataset.originalText = submitButton.textContent || 'Submit reservation request';
+      submitButton.textContent = 'Checking availability…';
+    }
+    try {
+      const response = await fetch(config.url.replace(/\/$/, '') + '/functions/v1/reservation-create', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          apikey: config.anonKey
+        },
+        body: JSON.stringify({
+          locationId: locationIds[locationKey],
+          guestName,
+          guestEmail,
+          guestPhone: null,
+          partySize,
+          startsAt,
+          customerNotes: 'Visit type: ' + visitType + (preorderItems.length
+            ? '\\nPre-order request: ' + preorderItems.map(item => item.name + ' ($' + item.price + ' CAD)').join(', ') + '. Estimated total: $' + preorderTotal + ' CAD.'
+            : ''),
+          website: ''
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) {
+        if (response.status === 503) {
+          if (confirmText) confirmText.textContent = 'Online reservations are not open for this location yet. Your request has not been saved or confirmed. Please contact Rooms Coffee directly.';
+        } else {
+          if (confirmText) confirmText.textContent = result.error || 'We could not submit this request. Your reservation is not confirmed.';
+        }
+        if (actionsEl) actionsEl.innerHTML = '<a class="btn btn-primary confirm-email-btn" href="https://roomscoffee.online/pages/locations" target="_blank" rel="noopener">Contact Rooms Coffee ↗</a>';
+        confirmBox?.classList.add('show');
+        return;
+      }
+
+      if (confirmText) confirmText.textContent = 'Your reservation request for ' + roomName + ' on ' + date + ' at ' + time + ' has been received and is pending confirmation. Confirmation code: ' + result.confirmationCode + '.';
+      if (actionsEl) actionsEl.textContent = 'Keep your confirmation code and wait for Rooms Coffee to confirm your table.';
+      confirmBox?.classList.add('show');
+      const formFields = document.getElementById('formFields');
+      if (formFields) formFields.style.display = 'none';
+      const cp = document.getElementById('confirmPreorder');
+      if (preorderItems.length && cp) {
+        cp.innerHTML = '<div class="mono" style="font-size:11px; opacity:.6; margin-bottom:8px;">Pre-order estimate</div>' +
+          preorderItems.map(item => '<div class="cp-row"><span>' + item.name + '</span><span>$' + item.price + ' CAD</span></div>').join('') +
+          '<div class="cp-row"><strong>Estimated total</strong><strong>$' + preorderTotal + ' CAD</strong></div>';
+      } else if (cp) cp.textContent = '';
+    } catch (_) {
+      if (confirmText) confirmText.textContent = 'We could not reach the reservation service. Your request has not been confirmed. Please try again or contact Rooms Coffee.';
+      if (actionsEl) actionsEl.innerHTML = '<a class="btn btn-primary confirm-email-btn" href="https://roomscoffee.online/pages/locations" target="_blank" rel="noopener">Contact Rooms Coffee ↗</a>';
+      confirmBox?.classList.add('show');
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = submitButton.dataset.originalText || 'Prepare reservation request';
+      }
     }
   });
 
