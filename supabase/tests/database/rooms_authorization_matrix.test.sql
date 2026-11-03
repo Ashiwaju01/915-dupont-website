@@ -36,12 +36,10 @@ values
   ('54444444-4444-4444-8444-444444444401', 'private note A'),
   ('54444444-4444-4444-8444-444444444402', 'private note B');
 
--- Anonymous users must not see customer reservations, staff notes or reservation settings.
-set local role anon;
-select is((select count(*)::integer from public.reservations), 0, 'anonymous role cannot read reservations');
-select is((select count(*)::integer from public.reservation_internal_notes), 0, 'anonymous role cannot read staff-only notes');
-select is((select count(*)::integer from public.reservation_settings), 0, 'anonymous role cannot read reservation settings');
-reset role;
+-- Anonymous API clients have no table-level read grants on sensitive reservation data.
+select ok(not has_table_privilege('anon', 'public.reservations', 'SELECT'), 'anonymous role has no reservation read grant');
+select ok(not has_table_privilege('anon', 'public.reservation_internal_notes', 'SELECT'), 'anonymous role has no internal-note read grant');
+select ok(not has_table_privilege('anon', 'public.reservation_settings', 'SELECT'), 'anonymous role has no reservation-settings read grant');
 
 -- Customer A can see only their own reservation/order and cannot see internal notes.
 set local role authenticated;
